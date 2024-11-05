@@ -7,11 +7,11 @@ export default function ListOfFoundThings({ items, onDelete }) {
     const fetchPreviews = async () => {
       const previewsData = {};
       for (const item of items) {
-        if (item.link && !previews[item._id]) {
+        if (item.productURL && !previews[item._id]) {
           try {
-            const response = await fetch(`/api/getUrlPreview?url=${encodeURIComponent(item.link)}`);
+            const response = await fetch(`/api/getUrlPreview?url=${encodeURIComponent(item.productURL)}`);
             const data = await response.json();
-            previewsData[item._id] = data;
+            previewsData[item._id] = data || {}; // Ensure at least an empty object if no data
           } catch (error) {
             console.error("Error fetching preview:", error);
           }
@@ -20,7 +20,9 @@ export default function ListOfFoundThings({ items, onDelete }) {
       setPreviews((prev) => ({ ...prev, ...previewsData }));
     };
 
-    fetchPreviews();
+    if (items.length > 0) {
+      fetchPreviews();
+    }
   }, [items]);
 
   return (
@@ -30,35 +32,23 @@ export default function ListOfFoundThings({ items, onDelete }) {
           <h2>{item.title}</h2>
           <p><strong>Description:</strong> {item.description}</p>
 
-          {item.link && (
+          {item.productURL && (
             <div className="url-preview">
-              <p>
-                <strong>Product link:</strong>{" "}
-                <a href={item.link} target="_blank" rel="noopener noreferrer">
-                  {item.link}
-                </a>
-              </p>
-              {previews[item._id] && (
-                <div className="url-metadata">
-                  {previews[item._id].images && previews[item._id].images.length > 0 && (
-                    <img src={previews[item._id].images[0]} alt="Preview" />
-                  )}
-                  <p>{previews[item._id].title}</p>
-                  <p>{previews[item._id].description}</p>
-                </div>
+              <a href={item.productURL} target="_blank" rel="noopener noreferrer">
+                {previews[item._id] && previews[item._id].image ? (
+                  <img src={previews[item._id].image} alt="Product Preview" />
+                ) : (
+                  <p>Click here to view product</p>
+                )}
+              </a>
+              {previews[item._id] && previews[item._id].title && (
+                <p>{previews[item._id].title}</p>
               )}
             </div>
           )}
 
           {item.price && <p><strong>Price:</strong> ${item.price}</p>}
-          {item.images && item.images.length > 0 && (
-            <div className="image-gallery">
-              <strong>Images:</strong>
-              {item.images.map((image, index) => (
-                <img key={index} src={image.asset.url} alt={`Image ${index + 1}`} />
-              ))}
-            </div>
-          )}
+          
           <button onClick={() => onDelete(item._id)}>Delete</button>
         </li>
       ))}

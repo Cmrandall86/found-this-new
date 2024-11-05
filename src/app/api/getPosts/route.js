@@ -1,3 +1,4 @@
+// src/app/api/getPosts/route.js
 import { createClient } from '@sanity/client';
 import { NextResponse } from 'next/server';
 
@@ -14,17 +15,19 @@ export async function GET() {
       _id,
       title,
       description,
-      link,
+      productURL,       // Updated field name
       price,
       "authorName": author->name,
       "authorEmail": author->email,
-      images
+      createdAt,
+      updatedAt
     }`;
 
     const posts = await client.fetch(query);
+    console.log('Fetched posts from Sanity:', posts);
     return NextResponse.json(posts);
   } catch (error) {
-    console.error("Error fetching posts:", error);
-    return NextResponse.json({ error: "Error fetching posts" }, { status: 500 });
+    console.error('Error fetching posts:', error);
+    return NextResponse.json({ error: 'Error fetching posts' }, { status: 500 });
   }
 }

@@ -4,23 +4,27 @@ import ListOfFoundThings from "@/components/ListOfFoundThings"; // Adjust the im
 
 export default function HomePage() {
   const [posts, setPosts] = useState([]);
-  const [newPost, setNewPost] = useState({ title: "", description: "", link: "", price: "" });
+  const [newPost, setNewPost] = useState({ title: "", description: "", productURL: "", price: "" });
   const [isFormVisible, setFormVisible] = useState(false);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         const response = await fetch("/api/getPosts");
-        if (!response.ok) throw new Error("Failed to fetch posts");
-        const data = await response.json();
-        setPosts(data);
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched posts in HomePage:", data); // Log data to verify entries
+          setPosts(data);
+        } else {
+          console.error("Failed to fetch posts:", response.statusText);
+        }
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
     };
-    fetchPosts();
-  }, []);
   
+    fetchPosts(); // Ensure this is only called once on component mount
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,13 +35,11 @@ export default function HomePage() {
     e.preventDefault();
     try {
       const newPostWithSchema = {
-        ...newPost,
-        author: {
-          _type: "reference",
-          _ref: "446810ab-8ae8-4fa2-85bf-46e0d04bd72d",
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        title: newPost.title,
+        description: newPost.description,
+        productURL: newPost.productURL,
+        price: newPost.price,
+        authorId: "446810ab-8ae8-4fa2-85bf-46e0d04bd72d", // Replace dynamically in the future
       };
   
       const response = await fetch("/api/createPost", {
@@ -49,35 +51,30 @@ export default function HomePage() {
       });
   
       if (response.ok) {
-        alert("Post created successfully!");
-        setNewPost({ title: "", description: "", link: "", price: "" });
         const updatedPost = await response.json();
-        setPosts([...posts, updatedPost]);
+        setPosts((prevPosts) => [...prevPosts, updatedPost]);
+        setNewPost({ title: "", description: "", productURL: "", price: "" }); // Clear form after submit
       } else {
-        alert("Failed to create post.");
+        console.error("Failed to create post:", response.statusText);
       }
     } catch (error) {
       console.error("Error creating post:", error);
     }
   };
-  
 
   const handleDelete = async (postId) => {
-    if (confirm("Are you sure you want to delete this?")) {
-      try {
-        const response = await fetch(`/api/deletePost?id=${postId}`, {
-          method: "DELETE",
-        });
+    try {
+      const response = await fetch(`/api/deletePost?id=${postId}`, {
+        method: "DELETE",
+      });
   
-        if (response.ok) {
-          alert("Post deleted successfully");
-          setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
-        } else {
-          console.error("Failed to delete post");
-        }
-      } catch (error) {
-        console.error("Error deleting post:", error);
+      if (response.ok) {
+        setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
+      } else {
+        console.error("Failed to delete post:", response.statusText);
       }
+    } catch (error) {
+      console.error("Error deleting post:", error);
     }
   };
 
@@ -128,14 +125,14 @@ export default function HomePage() {
               ></textarea>
             </div>
             <div className="form-group">
-              <label htmlFor="link" className="form-label">
+              <label htmlFor="productURL" className="form-label">
                 Product Link:
               </label>
               <input
                 type="url"
-                id="link"
-                name="link"
-                value={newPost.link}
+                id="productURL"
+                name="productURL"
+                value={newPost.productURL}
                 onChange={handleChange}
                 className="form-input"
               />
