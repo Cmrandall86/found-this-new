@@ -37,18 +37,18 @@ textarea {
   font-size: inherit;
   color: inherit;
   background: none;
+  border: none;
   padding: 0;
   outline: none;
 }
 
-/* Button styling */
+/* Set button-specific styles */
 button {
   cursor: pointer;
   background-color: #007bff;
   color: #fff;
   border-radius: 4px;
   padding: 8px 16px;
-  border: none;
   transition: background-color 0.3s ease;
 }
 
@@ -94,62 +94,91 @@ button {
 }
 
 /* Two-Column Layout Styles */
+
 .container-flex {
   display: flex;
   gap: 20px;
-  max-width: 1200px;
+  /* max-width: 1200px; */
   margin: 20px auto;
   padding: 20px;
+  position: relative;
+}
+
+/* Toggle Button */
+.toggle-button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-button:hover {
+  background-color: #0056b3;
+}
+
+/* Show form button */
+.show-form-button {
+  position: absolute;
+  left: 10px;
+  top: 0;
+  transform: translateY(-50%);
+  padding: 10px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.show-form-button:hover {
+  background-color: #0056b3;
 }
 
 /* Left column styling for the form */
 .left-column {
-  flex: 1 1 30%;
+  flex: 1;
   background-color: #ffffff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.5s ease, opacity 0.5s ease;
 }
 
-/* Right column styling for the list */
+.left-column.visible {
+  max-height: 600px;
+  opacity: 1;
+}
+
+.left-column.hidden {
+  max-width: 0;
+  padding: 0;
+}
+
+/* Right column styling */
 .right-column {
-  flex: 1 1 70%;
+  flex: 3;
   background-color: #f9f9f9;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Main title and form title */
-.main-title,
-.form-title {
-  text-align: center;
-  color: #007bff;
-}
-
-/* Adjust form title size for a smaller column */
-.form-title {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-}
-
-/* Input and Textarea Styling */
-.form-input, .form-textarea {
-  width: 100%;
-  padding: 12px;
-  font-size: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: #f9f9f9;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Input Focus Styling */
-.form-input:focus, .form-textarea:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-  background-color: #fff;
+.right-column.expanded {
+  flex: 3;
+  transition: flex 0.5s ease;
 }
 
 /* Form styling */
@@ -159,26 +188,79 @@ button {
   gap: 15px;
 }
 
-/* Apply hover and focus effects on the right-column items */
-.right-column .item {
-  padding: 15px;
-  border-bottom: 1px solid #ddd;
-  transition: background-color 0.3s ease;
+.form-group {
+  display: flex;
+  flex-direction: column;
 }
 
-.right-column .item:hover {
-  background-color: #e9e9e9;
+.form-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #555;
 }
+
+.form-input, .form-textarea {
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  width: 100%;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-input:focus, .form-textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  background-color: #fff;
+}
+
+.url-preview {
+  margin-top: 10px;
+}
+
+.url-metadata {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.url-metadata img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.url-metadata p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+
 
 /* Responsive adjustments */
 @media (max-width: 1179px) {
   .container-flex {
     flex-direction: column;
   }
+  
+  .right-column.expanded {
+    flex: 1;
+  }
 
-  .left-column,
-  .right-column {
+  .left-column, .right-column {
     width: 100%;
-    margin: 0 auto;
+  }
+
+  .show-form-button {
+    left: 50%;
+    transform: translateX(-50%);
+    top: auto;
+    bottom: 20px;
   }
 }

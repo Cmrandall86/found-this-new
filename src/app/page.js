@@ -5,12 +5,13 @@ import ListOfFoundThings from "@/components/ListOfFoundThings"; // Adjust the im
 export default function HomePage() {
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState({ title: "", description: "", link: "", price: "" });
+  const [isFormVisible, setFormVisible] = useState(false);
 
   useEffect(() => {
-    // Fetch posts from the API route
     const fetchPosts = async () => {
       try {
         const response = await fetch("/api/getPosts");
+        if (!response.ok) throw new Error("Failed to fetch posts");
         const data = await response.json();
         setPosts(data);
       } catch (error) {
@@ -19,6 +20,7 @@ export default function HomePage() {
     };
     fetchPosts();
   }, []);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,12 +34,12 @@ export default function HomePage() {
         ...newPost,
         author: {
           _type: "reference",
-          _ref: "446810ab-8ae8-4fa2-85bf-46e0d04bd72d", // Replace 'authorId' with actual data or selection from UI
+          _ref: "446810ab-8ae8-4fa2-85bf-46e0d04bd72d",
         },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-
+  
       const response = await fetch("/api/createPost", {
         method: "POST",
         headers: {
@@ -45,10 +47,10 @@ export default function HomePage() {
         },
         body: JSON.stringify(newPostWithSchema),
       });
-
+  
       if (response.ok) {
         alert("Post created successfully!");
-        setNewPost({ title: "", description: "", productLinks: "", price: "", images: [] });
+        setNewPost({ title: "", description: "", link: "", price: "" });
         const updatedPost = await response.json();
         setPosts([...posts, updatedPost]);
       } else {
@@ -58,92 +60,109 @@ export default function HomePage() {
       console.error("Error creating post:", error);
     }
   };
+  
 
   const handleDelete = async (postId) => {
-    try {
-      const response = await fetch(`/api/deletePost?id=${postId}`, {
-        method: "DELETE",
-      });
-      if (response.ok) {
-        if (confirm("Are you sure you want to delete this?")) {
+    if (confirm("Are you sure you want to delete this?")) {
+      try {
+        const response = await fetch(`/api/deletePost?id=${postId}`, {
+          method: "DELETE",
+        });
+  
+        if (response.ok) {
+          alert("Post deleted successfully");
           setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
+        } else {
+          console.error("Failed to delete post");
         }
-      } else {
-        console.error("Failed to delete post");
+      } catch (error) {
+        console.error("Error deleting post:", error);
       }
-    } catch (error) {
-      console.error("Error deleting post:", error);
     }
+  };
+
+  const toggleFormVisibility = () => {
+    setFormVisible(!isFormVisible);
   };
 
   return (
     <div className="container-flex">
-      <div className="left-column">
-        <h1 className="main-title">Product Deals</h1>
-        <h2 className="form-title">Add a New Post</h2>
-        <form onSubmit={handleSubmit} className="post-form">
-          <div className="form-group">
-            <label htmlFor="title" className="form-label">
-              Title:
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={newPost.title}
-              onChange={handleChange}
-              required
-              className="form-input"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="description" className="form-label">
-              Description:
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              value={newPost.description}
-              onChange={handleChange}
-              required
-              className="form-textarea"
-            ></textarea>
-          </div>
-          <div className="form-group">
-            <label htmlFor="link" className="form-label">
-              Product Link:
-            </label>
-            <input
-              type="url"
-              id="link"
-              name="link"
-              value={newPost.link}
-              onChange={handleChange}
-              className="form-input"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="price" className="form-label">
-              Price:
-            </label>
-            <input
-              type="number"
-              id="price"
-              name="price"
-              value={newPost.price}
-              onChange={handleChange}
-              required
-              className="form-input"
-            />
-          </div>
-          <button type="submit" className="submit-button">
-            Submit
-          </button>
-        </form>
+      {!isFormVisible && (
+        <button onClick={toggleFormVisibility} className="show-form-button">
+          Add New Post
+        </button>
+      )}
+
+      <div className={`left-column ${isFormVisible ? "visible" : "hidden"}`}>
+        <button onClick={toggleFormVisibility} className="toggle-button">
+          Hide Form
+        </button>
+
+        {isFormVisible && (
+          <form onSubmit={handleSubmit} className="post-form">
+            <div className="form-group">
+              <label htmlFor="title" className="form-label">
+                Title:
+              </label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={newPost.title}
+                onChange={handleChange}
+                required
+                className="form-input"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="description" className="form-label">
+                Description:
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={newPost.description}
+                onChange={handleChange}
+                required
+                className="form-textarea"
+              ></textarea>
+            </div>
+            <div className="form-group">
+              <label htmlFor="link" className="form-label">
+                Product Link:
+              </label>
+              <input
+                type="url"
+                id="link"
+                name="link"
+                value={newPost.link}
+                onChange={handleChange}
+                className="form-input"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="price" className="form-label">
+                Price:
+              </label>
+              <input
+                type="number"
+                id="price"
+                name="price"
+                value={newPost.price}
+                onChange={handleChange}
+                required
+                className="form-input"
+              />
+            </div>
+            <button type="submit" className="submit-button">
+              Submit
+            </button>
+          </form>
+        )}
       </div>
 
-      <div className="right-column">
-        {/* Use ListOfFoundThings to display posts */}
+      <div className={`right-column ${isFormVisible ? "" : "expanded"}`}>
+        <h1 className="main-title">Product Deals</h1>
         <ListOfFoundThings items={posts} onDelete={handleDelete} />
       </div>
     </div>
