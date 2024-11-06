@@ -95,23 +95,25 @@ export default function HomePage() {
 
   return (
     <div>
-      <div className="btns">
-        <div className="theme-toggle" onClick={toggleTheme}>
-          {isDarkMode ? (
-            <svg className="icon" viewBox="0 0 24 24">
-              <path d="M12 2a9.956 9.956 0 0 1 4.916 1.336 1 1 0 0 1-.19 1.741 7.962 7.962 0 1 0 5.243 7.525 9.974 9.974 0 0 1-9.969 9.398A10 10 0 0 1 12 2z"></path>
-            </svg>
-          ) : (
-            <svg className="icon" viewBox="0 0 24 24">
-              <path d="M6.76 4.84l-1.41-1.41-2.83 2.83 1.41 1.41L6.76 4.84zM1 13h3v-2H1v2zm10-8h2V1h-2v4zm7.24-2.17l1.41-1.41 2.83 2.83-1.41 1.41-2.83-2.83zM21 11v2h3v-2h-3zm-2.76 7.76l1.41 1.41-2.83 2.83-1.41-1.41 2.83-2.83zM13 23v-3h-2v3h2zm-7.24-2.17l2.83 2.83-1.41 1.41-2.83-2.83 1.41-1.41z"></path>
-              <circle cx="12" cy="12" r="5"></circle>
-            </svg>
-          )}
-        </div>
-        <button onClick={() => setFormVisible(!isFormVisible)} className="show-form-button">
-          {isFormVisible ? "Hide Form" : "Add New Post"}
-        </button>
-      </div>
+<div className="btns">
+  {/* Dark Mode Toggle Button */}
+
+
+  {/* Conditionally render "Add New Post" button only when form is hidden */}
+  {!isFormVisible && (
+    <button onClick={toggleFormVisibility} className="show-form-button">
+      Add New Post
+    </button>
+  )}
+    <button className="toggle-button" onClick={toggleTheme}>
+    {isDarkMode ? (
+      <span className="icon-moon">🌜</span>
+    ) : (
+      <span className="icon-sun">☀️</span>
+    )}
+  </button>
+</div>
+
       <div className="container-flex">
         {/* Form for Adding New Post (Left Side) */}
         <div className={`left-column ${isFormVisible ? "visible" : "hidden"}`}>
