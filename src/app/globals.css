@@ -1,6 +1,4 @@
 /* CSS Reset */
-
-/* Remove default margin, padding, and box-sizing */
 *,
 *::before,
 *::after {
@@ -9,132 +7,82 @@
   box-sizing: border-box;
 }
 
-/* Set basic body styles */
-body {
+/* Body Styles for Light and Dark Modes */
+body.light-mode {
   font-family: Arial, sans-serif;
   background-color: #f5f5f5;
   color: #333;
-  line-height: 1.5;
 }
 
-/* Remove list styles */
-ul,
-ol {
-  list-style-type: none;
+body.dark-mode {
+  font-family: Arial, sans-serif;
+  background-color: #1a1a1a;
+  color: #dcdcdc;
 }
 
-/* Anchor tags */
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-/* Set default button and input styles */
-button,
-input,
-textarea {
-  font-family: inherit;
-  font-size: inherit;
-  color: inherit;
-  background: none;
-  border: none;
-  padding: 0;
-  outline: none;
-}
-
-/* Set button-specific styles */
-button {
-  cursor: pointer;
-  background-color: #007bff;
-  color: #fff;
-  border-radius: 4px;
-  padding: 8px 16px;
-  transition: background-color 0.3s ease;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-/* Remove default table styles */
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-/* Default image styles */
-img {
-  max-width: 100%;
-  display: block;
-}
-
-/* Default box-sizing */
-html {
-  box-sizing: border-box;
-}
-
-/* Headings and paragraph defaults */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-weight: normal;
-}
-
-/* Form element reset */
-input,
-textarea,
-select,
-button {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-/* Two-Column Layout Styles */
-
+/* Container Flex */
 .container-flex {
   display: flex;
   gap: 20px;
-  /* max-width: 1200px; */
   margin: 20px auto;
   padding: 20px;
-  position: relative;
 }
 
 /* Toggle Button */
 .toggle-button {
-  width: 100%;
-  padding: 12px;
   margin-bottom: 15px;
-  font-size: 1rem;
-  font-weight: bold;
-  background-color: #007bff;
+  background-color: #1db954;
   color: #ffffff;
   border: none;
+  padding: 8px 16px;
+  font-weight: bold;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .toggle-button:hover {
-  background-color: #0056b3;
+  background-color: #1ed760;
 }
 
-/* Show form button */
+/* Theme Toggle Button */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #1db954;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background-color: #1ed760;
+}
+
+/* SVG Icon Styling */
+.icon {
+  width: 24px;
+  height: 24px;
+  fill: #ffffff;
+  transition: transform 0.3s ease;
+}
+
+/* Rotate the icon when toggling */
+.theme-toggle:hover .icon {
+  transform: scale(1.1);
+}
+
+
+/* Show Form Button */
 .show-form-button {
-  position: absolute;
-  left: 10px;
-  top: 0;
-  transform: translateY(-50%);
-  padding: 10px;
-  font-size: 0.9rem;
-  font-weight: bold;
   background-color: #007bff;
   color: #ffffff;
   border: none;
+  padding: 8px 16px;
+  font-weight: bold;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -144,7 +92,7 @@ button {
   background-color: #0056b3;
 }
 
-/* Left column styling for the form */
+/* Left Column Styling */
 .left-column {
   flex: 1;
   background-color: #ffffff;
@@ -154,34 +102,63 @@ button {
   max-height: 0;
   overflow: hidden;
   opacity: 0;
-  transition: max-height 0.5s ease, opacity 0.5s ease;
+  width: 0;
+  padding: 0;
+  transition: max-height 0.4s ease, opacity 0.4s ease, width 0.4s ease, padding 0.4s ease;
+}
+
+body.dark-mode .left-column {
+  background-color: #2a2a2a;
 }
 
 .left-column.visible {
   max-height: 600px;
   opacity: 1;
+  width: 100%;
+  padding: 20px; /* Restores padding smoothly */
 }
 
-.left-column.hidden {
-  max-width: 0;
-  padding: 0;
-}
-
-/* Right column styling */
+/* Right Column Styling */
 .right-column {
   flex: 3;
   background-color: #f9f9f9;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: flex 0.4s ease, padding 0.4s ease, width 0.4s ease;
 }
 
 .right-column.expanded {
-  flex: 3;
-  transition: flex 0.5s ease;
+  display: block;
+  width: 100%;
+  flex: none;
 }
 
-/* Form styling */
+body.dark-mode .right-column {
+  background-color: #292929;
+}
+
+
+/* Main Title Styling */
+.main-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #007bff;
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 10px 0;
+  border-bottom: 2px solid #ddd;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+body.dark-mode .main-title {
+  color: #1db954;
+  border-bottom: 2px solid #444;
+}
+
+/* Form Styling */
 .post-form {
   display: flex;
   flex-direction: column;
@@ -199,61 +176,124 @@ button {
   color: #555;
 }
 
-.form-input, .form-textarea {
+body.dark-mode .form-label {
+  color: #bbb;
+}
+
+.form-input,
+.form-textarea {
   padding: 12px;
   font-size: 1rem;
   border: 1px solid #ddd;
   border-radius: 4px;
   background-color: #f9f9f9;
-  width: 100%;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.form-input:focus, .form-textarea:focus {
+body.dark-mode .form-input,
+body.dark-mode .form-textarea {
+  background-color: #333;
+  border: 1px solid #555;
+}
+
+.form-input:focus,
+.form-textarea:focus {
   border-color: #007bff;
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
   background-color: #fff;
 }
 
-.url-preview {
-  margin-top: 10px;
+body.dark-mode .form-input:focus,
+body.dark-mode .form-textarea:focus {
+  border-color: #1db954;
+  box-shadow: 0 0 5px rgba(29, 185, 84, 0.5);
+  background-color: #2a2a2a;
 }
 
-.url-metadata {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 4px;
-  background-color: #f9f9f9;
-}
-
-.url-metadata img {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 4px;
-}
-
-.url-metadata p {
+/* List Styling for Modern Card Layout */
+.found-things-list {
+  list-style-type: none;
+  padding: 0;
   margin: 0;
-  font-size: 0.9rem;
+}
+
+.found-thing-item {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  padding: 20px;
+  transition: transform 0.2s ease;
+}
+
+body.dark-mode .found-thing-item {
+  background-color: #333333;
+  color: #dcdcdc;
+}
+
+.found-thing-item:hover {
+  transform: scale(1.02);
+}
+
+.found-thing-item h2 {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
   color: #333;
 }
 
+body.dark-mode .found-thing-item h2 {
+  color: #dcdcdc;
+}
 
-/* Responsive adjustments */
+.found-thing-item p {
+  color: #555;
+  margin-bottom: 8px;
+}
+
+body.dark-mode .found-thing-item p {
+  color: #bbb;
+}
+
+.found-thing-item p strong {
+  font-weight: 600;
+}
+
+.found-thing-item .url-preview a {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+body.dark-mode .found-thing-item .url-preview a {
+  color: #1db954;
+}
+
+.found-thing-item button {
+  background-color: #ff595e;
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.found-thing-item button:hover {
+  background-color: #e6454f;
+}
+
+/* Responsive Adjustments */
 @media (max-width: 1179px) {
   .container-flex {
     flex-direction: column;
   }
-  
+
   .right-column.expanded {
     flex: 1;
   }
 
-  .left-column, .right-column {
+  .left-column,
+  .right-column {
     width: 100%;
   }
 
