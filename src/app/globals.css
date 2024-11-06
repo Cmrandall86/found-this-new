@@ -49,20 +49,55 @@ body.dark-mode {
 }
 
 /* Theme Toggle Button */
-.theme-toggle {
-  display: inline-flex;
+/* Navbar styling for dark/light mode switch */
+.theme-toggle-wrapper {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #1db954;
+  gap: 10px;
   cursor: pointer;
+}
+
+.icon {
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+}
+
+body.light-mode .icon {
+  color: #ffab00; /* Sun color */
+}
+
+body.dark-mode .icon {
+  color: #f0e68c; /* Moon color */
+}
+
+/* Theme toggle slider */
+.theme-toggle {
+  width: 50px;
+  height: 24px;
+  background-color: #ddd;
+  border-radius: 15px;
+  position: relative;
   transition: background-color 0.3s ease;
 }
 
-.theme-toggle:hover {
-  background-color: #1ed760;
+body.dark-mode .theme-toggle {
+  background-color: #444;
+}
+
+.toggle-slider {
+  width: 22px;
+  height: 22px;
+  background-color: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .toggle-slider {
+  left: 26px; /* Slide to the right in dark mode */
+  background-color: #1db954;
 }
 
 /* Style for the Submit Button */
@@ -92,17 +127,6 @@ body.dark-mode .submit-button:hover {
 }
 
 /* SVG Icon Styling */
-.icon {
-  width: 24px;
-  height: 24px;
-  fill: #ffffff;
-  transition: transform 0.3s ease;
-}
-
-/* Rotate the icon when toggling */
-.theme-toggle:hover .icon {
-  transform: scale(1.1);
-}
 
 .btns {
   display: flex;
@@ -121,6 +145,14 @@ body.dark-mode .submit-button:hover {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+}
+
+.close-form {
+  display: flex;
+  justify-content: end;
 }
 
 .show-form-button:hover {

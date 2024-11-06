@@ -1,12 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import ListOfFoundThings from "@/components/ListOfFoundThings"; // Adjust the import path as necessary
+import Navbar from "@/components/Navbar";
 
 export default function HomePage() {
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState({ title: "", description: "", productURL: "", price: "" });
   const [isFormVisible, setFormVisible] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -20,23 +20,11 @@ export default function HomePage() {
     };
     fetchPosts();
 
-    const storedTheme = localStorage.getItem("theme");
-    if (storedTheme) {
-      setIsDarkMode(storedTheme === "dark");
-      document.body.classList.add(storedTheme === "dark" ? "dark-mode" : "light-mode");
-    } else {
-      document.body.classList.add("light-mode");
-    }
+
   }, []);
 
-  const toggleTheme = () => {
-    const newTheme = isDarkMode ? "light-mode" : "dark-mode";
-    setIsDarkMode(!isDarkMode);
-    document.body.classList.remove("light-mode", "dark-mode");
-    document.body.classList.add(newTheme);
-    localStorage.setItem("theme", !isDarkMode ? "dark" : "light");
-  };
-  
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewPost({ ...newPost, [name]: value });
@@ -95,32 +83,21 @@ export default function HomePage() {
 
   return (
     <div>
-<div className="btns">
-  {/* Dark Mode Toggle Button */}
+      <Navbar
+        isFormVisible={isFormVisible}
+        toggleFormVisibility={toggleFormVisibility}
+      />
 
-
-  {/* Conditionally render "Add New Post" button only when form is hidden */}
-  {!isFormVisible && (
-    <button onClick={toggleFormVisibility} className="show-form-button">
-      Add New Post
-    </button>
-  )}
-    <button className="toggle-button" onClick={toggleTheme}>
-    {isDarkMode ? (
-      <span className="icon-moon">🌜</span>
-    ) : (
-      <span className="icon-sun">☀️</span>
-    )}
-  </button>
-</div>
 
       <div className="container-flex">
         {/* Form for Adding New Post (Left Side) */}
         <div className={`left-column ${isFormVisible ? "visible" : "hidden"}`}>
+          <div className="close-form">
           <button onClick={toggleFormVisibility} className="toggle-button">
-            Hide Form
+            X
           </button>
-  
+          </div>
+
           {isFormVisible && (
             <form onSubmit={handleSubmit} className="post-form">
               <div className="form-group">
@@ -183,7 +160,7 @@ export default function HomePage() {
             </form>
           )}
         </div>
-  
+
         {/* Display List of Found Items (Right Side) */}
         <div className={`right-column ${isFormVisible ? "" : "expanded"}`}>
           <h1 className="main-title">Curated Finds</h1>
@@ -192,5 +169,4 @@ export default function HomePage() {
       </div>
     </div>
   );
-  
 }
