@@ -7,24 +7,28 @@ export default function HomePage() {
   const [newPost, setNewPost] = useState({ title: "", description: "", productURL: "", price: "" });
   const [isFormVisible, setFormVisible] = useState(false);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await fetch("/api/getPosts");
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Fetched posts in HomePage:", data); // Log data to verify entries
-          setPosts(data);
-        } else {
-          console.error("Failed to fetch posts:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error fetching posts:", error);
+// Inside the HomePage component
+useEffect(() => {
+  const fetchPosts = async () => {
+    try {
+      const response = await fetch('/api/getPosts', {
+        method: 'GET',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPosts(data);
+      } else {
+        console.error("Failed to fetch posts:", response.statusText);
       }
-    };
-  
-    fetchPosts(); // Ensure this is only called once on component mount
-  }, []);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
+
+  fetchPosts();
+}, [posts]); // Add 'posts' as a dependency to refetch data on changes
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,7 +42,7 @@ export default function HomePage() {
         title: newPost.title,
         description: newPost.description,
         productURL: newPost.productURL,
-        price: newPost.price,
+        price: Number(newPost.price),
         authorId: "446810ab-8ae8-4fa2-85bf-46e0d04bd72d", // Replace dynamically in the future
       };
   
@@ -160,7 +164,7 @@ export default function HomePage() {
 
       <div className={`right-column ${isFormVisible ? "" : "expanded"}`}>
         <h1 className="main-title">Product Deals</h1>
-        <ListOfFoundThings items={posts} onDelete={handleDelete} />
+        <ListOfFoundThings key={posts.length} items={posts} onDelete={handleDelete} />
       </div>
     </div>
   );

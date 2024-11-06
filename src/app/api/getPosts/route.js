@@ -1,13 +1,6 @@
 // src/app/api/getPosts/route.js
-import { createClient } from '@sanity/client';
+import client from '../../../../lib/sanityClient'; 
 import { NextResponse } from 'next/server';
-
-const client = createClient({
-  projectId: 'szt6zdnb',
-  dataset: 'production',
-  apiVersion: '2023-01-01',
-  useCdn: false,
-});
 
 export async function GET() {
   try {
@@ -15,7 +8,7 @@ export async function GET() {
       _id,
       title,
       description,
-      productURL,       // Updated field name
+      productURL,
       price,
       "authorName": author->name,
       "authorEmail": author->email,
@@ -24,7 +17,6 @@ export async function GET() {
     }`;
 
     const posts = await client.fetch(query);
-    console.log('Fetched posts from Sanity:', posts);
     return NextResponse.json(posts);
   } catch (error) {
     console.error('Error fetching posts:', error);
