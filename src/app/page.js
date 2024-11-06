@@ -93,7 +93,7 @@ export default function HomePage() {
         {/* Form for Adding New Post (Left Side) */}
         <div className={`left-column ${isFormVisible ? "visible" : "hidden"}`}>
           <div className="close-form">
-          <button onClick={toggleFormVisibility} className="toggle-button">
+          <button onClick={toggleFormVisibility} className="toggle-button close-form">
             X
           </button>
           </div>

@@ -1,5 +1,41 @@
 @import url('https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap');
 
+/* CSS Variables */
+:root {
+  /* Light Mode Colors */
+  --light-bg: #f5f5f5;
+  --light-text: #333;
+  --light-form-bg: #ffffff;
+  --light-border: #ddd;
+  --light-button-bg: #007bff;
+  --light-button-hover-bg: #0056b3;
+  --light-submit-bg: #1db954;
+  --light-submit-hover-bg: #17a347;
+  --light-card-bg: #ffffff;
+  --light-card-shadow: rgba(0, 0, 0, 0.1);
+  --light-icon-sun: #ffab00;
+
+  /* Dark Mode Colors */
+  --dark-bg: #1a1a1a;
+  --dark-text: #dcdcdc;
+  --dark-form-bg: #2a2a2a;
+  --dark-border: #555;
+  --dark-button-bg: #111;
+  --dark-button-hover-bg: #fff;
+  --dark-submit-bg: #3cba7a;
+  --dark-submit-hover-bg: #34a868;
+  --dark-card-bg: #333333;
+  --dark-card-shadow: rgba(0, 0, 0, 0.3);
+  --dark-icon-moon: #f0e68c;
+
+  /* Shared Colors */
+  --primary-green: #1db954;
+  --primary-green-hover: #17a84f;
+  --danger-bg: #ff595e;
+  --danger-hover-bg: #e6454f;
+  --primary-font: Arial, sans-serif;
+}
+
 /* CSS Reset */
 *,
 *::before,
@@ -11,15 +47,17 @@
 
 /* Body Styles for Light and Dark Modes */
 body.light-mode {
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
-  color: #333;
+  font-family: var(--primary-font);
+  background-color: var(--light-bg);
+  color: var(--light-text);
+  padding: 20px;
 }
 
 body.dark-mode {
-  font-family: Arial, sans-serif;
-  background-color: #1a1a1a;
-  color: #dcdcdc;
+  font-family: var(--primary-font);
+  background-color: var(--dark-bg);
+  color: var(--dark-text);
+  padding: 20px;
 }
 
 /* Container Flex */
@@ -33,7 +71,7 @@ body.dark-mode {
 /* Toggle Button */
 .toggle-button {
   margin-bottom: 15px;
-  background-color: #111;
+  background-color: var(--dark-button-bg);
   color: #ffffff;
   border: none;
   padding: 8px 16px;
@@ -44,33 +82,23 @@ body.dark-mode {
   transition: background-color 0.3s ease;
 }
 
-.toggle-button:hover {
-  background-color: #fff;
+body.light-mode .toggle-button:hover {
+  background-color: var(--light-button-hover-bg);
 }
 
-/* Theme Toggle Button */
-/* Navbar styling for dark/light mode switch */
+body.dark-mode .toggle-button:hover {
+  background-color: var(--dark-button-hover-bg);
+}
+
+/* Theme Toggle Styles */
 .theme-toggle-wrapper {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
   cursor: pointer;
+  padding: 4px; /* Optional padding for spacing */
 }
 
-.icon {
-  font-size: 1.2rem;
-  transition: color 0.3s ease;
-}
-
-body.light-mode .icon {
-  color: #ffab00; /* Sun color */
-}
-
-body.dark-mode .icon {
-  color: #f0e68c; /* Moon color */
-}
-
-/* Theme toggle slider */
 .theme-toggle {
   width: 50px;
   height: 24px;
@@ -96,13 +124,26 @@ body.dark-mode .theme-toggle {
 }
 
 body.dark-mode .toggle-slider {
-  left: 26px; /* Slide to the right in dark mode */
+  left: 26px;
   background-color: #1db954;
 }
 
-/* Style for the Submit Button */
+.icon {
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+}
+
+body.light-mode .icon {
+  color: #ffab00;
+}
+
+body.dark-mode .icon {
+  color: #f0e68c;
+}
+
+/* Form Button Styling */
 .submit-button {
-  background-color: #1db954; /* Bright green for submit */
+  background-color: var(--light-submit-bg);
   color: #ffffff;
   padding: 10px 20px;
   font-weight: bold;
@@ -113,85 +154,94 @@ body.dark-mode .toggle-slider {
   transition: background-color 0.3s ease;
 }
 
-.submit-button:hover {
-  background-color: #17a347; /* Darker green for hover */
+body.dark-mode .submit-button {
+  background-color: var(--dark-submit-bg);
 }
 
-body.dark-mode .submit-button {
-  background-color: #3cba7a; /* Slightly muted green for dark mode */
-  color: #ffffff;
+.submit-button:hover {
+  background-color: var(--light-submit-hover-bg);
 }
 
 body.dark-mode .submit-button:hover {
-  background-color: #34a868;
+  background-color: var(--dark-submit-hover-bg);
 }
 
-/* SVG Icon Styling */
-
-.btns {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  padding: 20px;
-}
-
-/* Show Form Button */
+/* Floating Action Button */
 .show-form-button {
-  background-color: #007bff;
+  width: 50px;
+  height: 50px;
+  background-color: var(--primary-green);
   color: #ffffff;
   border: none;
-  padding: 8px 16px;
+  font-size: 2rem;
   font-weight: bold;
-  border-radius: 4px;
+  border-radius: 50%;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
+  position: fixed;
+  bottom: 30px;
+  right: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px var(--light-card-shadow);
+  transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
+.show-form-button:hover {
+  background-color: var(--primary-green-hover);
+  transform: scale(1.1);
+}
+
+.plus-icon {
+  display: inline-block;
+  line-height: 1;
+  transform: translateY(-2px);
+}
+
+/* Column Styling */
+.left-column {
+  flex: 1;
+  background-color: var(--light-form-bg);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px var(--light-card-shadow);
+  transition: all 0.4s ease;
+}
+
+body.dark-mode .left-column {
+  background-color: var(--dark-form-bg);
+}
+body.dark-mode .left-column input, body.dark-mode .left-column textarea {
+  color: var(--dark-text);
+}
+
+.left-column.hidden {
+  display: none; /* Completely hides the left column when not visible */
+}
+
+.left-column.visible {
+  display: block; /* Shows the left column when visible */
+}
+
+
+/* Close Form Button */
 .close-form {
   display: flex;
   justify-content: end;
 }
 
-.show-form-button:hover {
-  background-color: #0056b3;
-}
-
-/* Left Column Styling */
-.left-column {
-  flex: 1;
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  width: 0;
-  padding: 0;
-  transition: max-height 0.4s ease, opacity 0.4s ease, width 0.4s ease, padding 0.4s ease;
-}
-
-body.dark-mode .left-column {
-  background-color: #2a2a2a;
-}
-
-.left-column.visible {
-  max-height: 600px;
-  opacity: 1;
-  width: 100%;
-  padding: 20px; /* Restores padding smoothly */
+body.dark-mode .close-form button:hover {
+  background: var(--dark-button-hover-bg);
+  color: var(--dark-button-bg);
 }
 
 /* Right Column Styling */
 .right-column {
   flex: 3;
-  background-color: #f9f9f9;
+  background-color: var(--light-card-bg);
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px var(--light-card-shadow);
   transition: flex 0.4s ease, padding 0.4s ease, width 0.4s ease;
 }
 
@@ -202,9 +252,9 @@ body.dark-mode .left-column {
 }
 
 body.dark-mode .right-column {
-  background-color: #292929;
+  background-color: var(--dark-card-bg);
+  box-shadow: 0 4px 8px var(--dark-card-shadow);
 }
-
 
 /* Main Title Styling */
 .main-title {
@@ -213,18 +263,16 @@ body.dark-mode .right-column {
   text-align: center;
   margin-bottom: 20px;
   padding: 10px 0;
-  border-bottom: 2px solid #ddd;
+  border-bottom: 2px solid var(--light-border);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-transform: uppercase;
   letter-spacing: 1px;
   font-family: "Rock Salt", cursive;
-  font-weight: 400;
-  font-style: normal;
 }
 
 body.dark-mode .main-title {
-  color: #1db954;
-  border-bottom: 2px solid #444;
+  color: var(--primary-green);
+  border-bottom: 2px solid var(--dark-border);
 }
 
 /* Form Styling */
@@ -253,7 +301,7 @@ body.dark-mode .form-label {
 .form-textarea {
   padding: 12px;
   font-size: 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--light-border);
   border-radius: 4px;
   background-color: #f9f9f9;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -262,24 +310,24 @@ body.dark-mode .form-label {
 body.dark-mode .form-input,
 body.dark-mode .form-textarea {
   background-color: #333;
-  border: 1px solid #555;
+  border: 1px solid var(--dark-border);
 }
 
 .form-input:focus,
 .form-textarea:focus {
-  border-color: #007bff;
+  border-color: var(--light-button-bg);
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
   background-color: #fff;
 }
 
 body.dark-mode .form-input:focus,
 body.dark-mode .form-textarea:focus {
-  border-color: #1db954;
+  border-color: var(--primary-green);
   box-shadow: 0 0 5px rgba(29, 185, 84, 0.5);
   background-color: #2a2a2a;
 }
 
-/* List Styling for Modern Card Layout */
+/* Card Layout for Items */
 .found-things-list {
   list-style-type: none;
   padding: 0;
@@ -287,17 +335,17 @@ body.dark-mode .form-textarea:focus {
 }
 
 .found-thing-item {
-  background-color: #ffffff;
+  background-color: var(--light-card-bg);
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px var(--light-card-shadow);
   margin-bottom: 20px;
   padding: 20px;
   transition: transform 0.2s ease;
 }
 
 body.dark-mode .found-thing-item {
-  background-color: #333333;
-  color: #dcdcdc;
+  background-color: var(--dark-card-bg);
+  color: var(--dark-text);
 }
 
 .found-thing-item:hover {
@@ -307,11 +355,11 @@ body.dark-mode .found-thing-item {
 .found-thing-item h2 {
   font-size: 1.4rem;
   margin-bottom: 10px;
-  color: #333;
+  color: var(--light-text);
 }
 
 body.dark-mode .found-thing-item h2 {
-  color: #dcdcdc;
+  color: var(--dark-text);
 }
 
 .found-thing-item p {
@@ -328,16 +376,16 @@ body.dark-mode .found-thing-item p {
 }
 
 .found-thing-item .url-preview a {
-  color: #007bff;
+  color: var(--light-button-bg);
   text-decoration: underline;
 }
 
 body.dark-mode .found-thing-item .url-preview a {
-  color: #1db954;
+  color: var(--primary-green);
 }
 
 .found-thing-item button {
-  background-color: #ff595e;
+  background-color: var(--danger-bg);
   color: #ffffff;
   border: none;
   padding: 8px 16px;
@@ -348,7 +396,7 @@ body.dark-mode .found-thing-item .url-preview a {
 }
 
 .found-thing-item button:hover {
-  background-color: #e6454f;
+  background-color: var(--danger-hover-bg);
 }
 
 /* Responsive Adjustments */
