@@ -3,7 +3,6 @@ import { useTable, useSortBy, useGlobalFilter } from "react-table";
 
 export default function ListOfFoundThings({ items, onDelete }) {
   const [globalFilter, setGlobalFilter] = useState("");
-  const [sortField, setSortField] = useState("title");
   const [previews, setPreviews] = useState({});
 
   // Fetch preview data for an item
@@ -65,9 +64,14 @@ export default function ListOfFoundThings({ items, onDelete }) {
   };
 
   const handleSortChange = (e) => {
-    const field = e.target.value;
-    setSortField(field);
-    toggleSortBy(field, false);
+    const value = e.target.value;
+    if (value === "title") {
+      toggleSortBy("title", false); // Sort by title in ascending order
+    } else if (value === "priceLow") {
+      toggleSortBy("price", false); // Sort by price in ascending order (low to high)
+    } else if (value === "priceHigh") {
+      toggleSortBy("price", true); // Sort by price in descending order (high to low)
+    }
   };
 
   return (
@@ -81,9 +85,10 @@ export default function ListOfFoundThings({ items, onDelete }) {
           onChange={handleSearch}
           className="filter-input"
         />
-        <select value={sortField} onChange={handleSortChange} className="sort-select">
+        <select onChange={handleSortChange} className="sort-select">
           <option value="title">Sort by Title</option>
-          <option value="price">Sort by Price</option>
+          <option value="priceLow">Price Low to High</option>
+          <option value="priceHigh">Price High to Low</option>
         </select>
       </div>
 
