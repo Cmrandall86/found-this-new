@@ -16,6 +16,7 @@
     "autoprefixer": "^10.4.20",
     "link-preview-js": "^3.0.12",
     "next": "^15.0.2",
+    "open-graph-scraper": "^6.8.2",
     "postcss": "^8.4.47",
     "react": "^18",
     "react-dom": "^18",

@@ -10,8 +10,6 @@ export async function GET() {
       description,
       productURL,
       price,
-      "authorName": author->name,
-      "authorEmail": author->email,
       createdAt,
       updatedAt
     }`;

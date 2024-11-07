@@ -1,12 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import ListOfFoundThings from "@/components/ListOfFoundThings"; // Adjust the import path as necessary
+import ListOfFoundThings from "@/components/ListOfFoundThings";
 import Navbar from "@/components/Navbar";
 import './globals.css';
 
 export default function HomePage() {
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState({ title: "", description: "", productURL: "", price: "" });
+  const [previewData, setPreviewData] = useState(null); // Store preview data temporarily
   const [isFormVisible, setFormVisible] = useState(false);
 
   useEffect(() => {
@@ -20,26 +21,46 @@ export default function HomePage() {
       }
     };
     fetchPosts();
-
-
   }, []);
-
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewPost({ ...newPost, [name]: value });
   };
 
+  // Fetch preview data dynamically for a given URL
+  const fetchPreviewData = async (url) => {
+    try {
+      const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}`);
+      const data = await response.json();
+      setPreviewData({
+        title: data.title || "No title",
+        description: data.description || "No description",
+        images: data.images.slice(0, 4), // Limit to 4 images
+      });
+    } catch (error) {
+      console.error("Error fetching preview data:", error);
+      setPreviewData(null);
+    }
+  };
+
+  // Fetch preview data when the product URL field loses focus
+  const handleProductURLBlur = () => {
+    if (newPost.productURL) {
+      fetchPreviewData(newPost.productURL);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const newPostWithSchema = {
+      const newPostData = {
         title: newPost.title,
         description: newPost.description,
         productURL: newPost.productURL,
         price: Number(newPost.price),
-        authorId: "446810ab-8ae8-4fa2-85bf-46e0d04bd72d", // Replace dynamically in the future
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       const response = await fetch("/api/createPost", {
@@ -47,13 +68,14 @@ export default function HomePage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newPostWithSchema),
+        body: JSON.stringify(newPostData),
       });
 
       if (response.ok) {
-        const updatedPost = await response.json();
-        setPosts((prevPosts) => [...prevPosts, updatedPost]);
-        setNewPost({ title: "", description: "", productURL: "", price: "" }); // Clear form after submit
+        const createdPost = await response.json();
+        setPosts((prevPosts) => [...prevPosts, createdPost]);
+        setNewPost({ title: "", description: "", productURL: "", price: "" });
+        setPreviewData(null); // Clear preview data after submit
       } else {
         console.error("Failed to create post:", response.statusText);
       }
@@ -84,19 +106,15 @@ export default function HomePage() {
 
   return (
     <div>
-      <Navbar
-        isFormVisible={isFormVisible}
-        toggleFormVisibility={toggleFormVisibility}
-      />
-
+      <Navbar isFormVisible={isFormVisible} toggleFormVisibility={toggleFormVisibility} />
 
       <div className="container-flex">
         {/* Form for Adding New Post (Left Side) */}
         <div className={`left-column ${isFormVisible ? "visible" : "hidden"}`}>
           <div className="close-form">
-          <button onClick={toggleFormVisibility} className="toggle-button close-form">
-            X
-          </button>
+            <button onClick={toggleFormVisibility} className="toggle-button close-form">
+              X
+            </button>
           </div>
 
           {isFormVisible && (
@@ -138,6 +156,7 @@ export default function HomePage() {
                   name="productURL"
                   value={newPost.productURL}
                   onChange={handleChange}
+                  onBlur={handleProductURLBlur}
                   className="form-input"
                 />
               </div>
@@ -158,6 +177,20 @@ export default function HomePage() {
               <button type="submit" className="submit-button">
                 Submit
               </button>
+
+              {/* Preview Data */}
+              {previewData && (
+                <div className="preview-section">
+                  <h4>Preview</h4>
+                  <p><strong>{previewData.title}</strong></p>
+                  <p>{previewData.description}</p>
+                  <div className="preview-images">
+                    {previewData.images.map((image, index) => (
+                      <img key={index} src={image} alt="Preview" className="preview-image" />
+                    ))}
+                  </div>
+                </div>
+              )}
             </form>
           )}
         </div>

@@ -12,7 +12,6 @@ export async function POST(request) {
       description: data.description,
       productURL: data.productURL,
       price: data.price,
-      author: { _type: "reference", _ref: data.authorId },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
