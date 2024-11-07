@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import ListOfFoundThings from "@/components/ListOfFoundThings"; // Adjust the import path as necessary
 import Navbar from "@/components/Navbar";
+import './globals.css';
 
 export default function HomePage() {
   const [posts, setPosts] = useState([]);
