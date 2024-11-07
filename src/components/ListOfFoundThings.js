@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { useTable, useSortBy } from "react-table";
+import { useTable, useSortBy, useGlobalFilter } from "react-table";
 
 export default function ListOfFoundThings({ items, onDelete }) {
-  const [searchKeyword, setSearchKeyword] = useState("");
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [sortField, setSortField] = useState("title");
 
-  // Define columns for React Table
   const columns = React.useMemo(
     () => [
       {
@@ -21,7 +21,7 @@ export default function ListOfFoundThings({ items, onDelete }) {
         Cell: ({ value }) =>
           value ? (
             <a href={value} target="_blank" rel="noopener noreferrer">
-              Click here to view product
+              View Product
             </a>
           ) : null,
       },
@@ -30,93 +30,78 @@ export default function ListOfFoundThings({ items, onDelete }) {
         accessor: "price",
         Cell: ({ value }) => (value ? `$${value}` : "N/A"),
       },
-      {
-        Header: "Actions",
-        accessor: "_id",
-        Cell: ({ value }) => (
-          <button
-            onClick={() =>
-              window.confirm("Are you sure you want to delete this item?") &&
-              onDelete(value)
-            }
-          >
-            Delete
-          </button>
-        ),
-      },
     ],
-    [onDelete]
+    []
   );
 
-  // Filter the data based on the search keyword
-  const filteredItems = React.useMemo(() => {
-    return items.filter(
-      (item) =>
-        item.title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchKeyword.toLowerCase())
-    );
-  }, [items, searchKeyword]);
-
-  // Prepare the table instance with filtered data and columns
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
-    { columns, data: filteredItems },
+  const {
+    rows,
+    prepareRow,
+    setGlobalFilter: setTableGlobalFilter,
+    toggleSortBy,
+  } = useTable(
+    {
+      columns,
+      data: items,
+      globalFilter,
+    },
+    useGlobalFilter,
     useSortBy
   );
 
+  // Handle keyword search
+  const handleSearch = (e) => {
+    setGlobalFilter(e.target.value);
+    setTableGlobalFilter(e.target.value);
+  };
+
+  // Handle sorting change
+  const handleSortChange = (e) => {
+    const field = e.target.value;
+    setSortField(field);
+    toggleSortBy(field, false); // `false` sets ascending order
+  };
+
   return (
     <div>
-      {/* Search Input */}
-      <input
-        type="text"
-        placeholder="Search by keyword..."
-        value={searchKeyword}
-        onChange={(e) => setSearchKeyword(e.target.value)}
-        style={{
-          marginBottom: "10px",
-          padding: "8px",
-          borderRadius: "4px",
-          border: "1px solid #ddd",
-          width: "100%",
-          maxWidth: "300px",
-        }}
-      />
+      {/* Filter and Sort Controls */}
+      <div className="filter-controls">
+        <input
+          type="text"
+          placeholder="Search by title..."
+          value={globalFilter}
+          onChange={handleSearch}
+          className="filter-input"
+        />
+        <select value={sortField} onChange={handleSortChange} className="sort-select">
+          <option value="title">Sort by Title</option>
+          <option value="price">Sort by Price</option>
+        </select>
+      </div>
 
-      {/* Table */}
-      <table {...getTableProps()} className="found-things-table">
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr key={headerGroup.getHeaderGroupProps().key}>
-              {headerGroup.headers.map((column) => {
-                const { key, ...headerProps } = column.getHeaderProps(column.getSortByToggleProps());
-                return (
-                  <th key={key} {...headerProps}>
-                    {column.render("Header")}
-                    <span>{column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""}</span>
-                  </th>
-                );
-              })}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            const { key, ...rowProps } = row.getRowProps();
-            return (
-              <tr key={key} {...rowProps}>
-                {row.cells.map((cell) => {
-                  const { key, ...cellProps } = cell.getCellProps();
-                  return (
-                    <td key={key} {...cellProps}>
-                      {cell.render("Cell")}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      {/* Card Grid */}
+      <div className="grid-container">
+        {rows.map((row) => {
+          prepareRow(row);
+          const { title, description, productURL, price } = row.values;
+
+          return (
+            <div className="card" key={row.id}>
+              <h3 className="card-title">{title}</h3>
+              <p className="card-description">{description}</p>
+              {productURL && (
+                <a href={productURL} target="_blank" rel="noopener noreferrer" className="card-link">
+                  View Product
+                </a>
+              )}
+              <p className="card-price">{price ? `$${price}` : "N/A"}</p>
+              <button onClick={() => onDelete(row.id)} className="card-delete">
+                Delete
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
