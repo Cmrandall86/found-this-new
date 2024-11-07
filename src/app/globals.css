@@ -380,6 +380,27 @@ body.dark-mode .found-thing-item p {
   text-decoration: underline;
 }
 
+.found-things-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.found-things-table th, .found-things-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.found-things-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.found-things-table tr:hover {
+  background-color: #f1f1f1;
+}
+
 body.dark-mode .found-thing-item .url-preview a {
   color: var(--primary-green);
 }
