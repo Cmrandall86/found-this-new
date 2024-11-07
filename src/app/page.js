@@ -7,7 +7,7 @@ import './globals.css';
 export default function HomePage() {
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState({ title: "", description: "", productURL: "", price: "" });
-  const [previewData, setPreviewData] = useState(null); // Store preview data temporarily
+  const [previewData, setPreviewData] = useState(null);
   const [isFormVisible, setFormVisible] = useState(false);
 
   useEffect(() => {
@@ -28,7 +28,6 @@ export default function HomePage() {
     setNewPost({ ...newPost, [name]: value });
   };
 
-  // Fetch preview data dynamically for a given URL
   const fetchPreviewData = async (url) => {
     try {
       const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}`);
@@ -36,7 +35,7 @@ export default function HomePage() {
       setPreviewData({
         title: data.title || "No title",
         description: data.description || "No description",
-        images: data.images.slice(0, 4), // Limit to 4 images
+        images: data.images.slice(0, 4),
       });
     } catch (error) {
       console.error("Error fetching preview data:", error);
@@ -44,7 +43,6 @@ export default function HomePage() {
     }
   };
 
-  // Fetch preview data when the product URL field loses focus
   const handleProductURLBlur = () => {
     if (newPost.productURL) {
       fetchPreviewData(newPost.productURL);
@@ -76,6 +74,7 @@ export default function HomePage() {
         setPosts((prevPosts) => [...prevPosts, createdPost]);
         setNewPost({ title: "", description: "", productURL: "", price: "" });
         setPreviewData(null); // Clear preview data after submit
+        setFormVisible(false); // Hide form after submission
       } else {
         console.error("Failed to create post:", response.statusText);
       }
@@ -110,19 +109,16 @@ export default function HomePage() {
 
       <div className="container-flex">
         {/* Form for Adding New Post (Left Side) */}
-        <div className={`left-column ${isFormVisible ? "visible" : "hidden"}`}>
-          <div className="close-form">
-            <button onClick={toggleFormVisibility} className="toggle-button close-form">
-              X
-            </button>
-          </div>
-
-          {isFormVisible && (
+        {isFormVisible && (
+          <div className="left-column form-visible">
             <form onSubmit={handleSubmit} className="post-form">
+            <div className="close-form">
+              <button onClick={toggleFormVisibility} className="toggle-button close-form">
+                X
+              </button>
+            </div>
               <div className="form-group">
-                <label htmlFor="title" className="form-label">
-                  Title:
-                </label>
+                <label htmlFor="title" className="form-label">Title:</label>
                 <input
                   type="text"
                   id="title"
@@ -134,9 +130,7 @@ export default function HomePage() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="description" className="form-label">
-                  Description:
-                </label>
+                <label htmlFor="description" className="form-label">Description:</label>
                 <textarea
                   id="description"
                   name="description"
@@ -147,9 +141,7 @@ export default function HomePage() {
                 ></textarea>
               </div>
               <div className="form-group">
-                <label htmlFor="productURL" className="form-label">
-                  Product Link:
-                </label>
+                <label htmlFor="productURL" className="form-label">Product Link:</label>
                 <input
                   type="url"
                   id="productURL"
@@ -161,9 +153,7 @@ export default function HomePage() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="price" className="form-label">
-                  Price:
-                </label>
+                <label htmlFor="price" className="form-label">Price:</label>
                 <input
                   type="number"
                   id="price"
@@ -174,9 +164,7 @@ export default function HomePage() {
                   className="form-input"
                 />
               </div>
-              <button type="submit" className="submit-button">
-                Submit
-              </button>
+              <button type="submit" className="submit-button">Submit</button>
 
               {/* Preview Data */}
               {previewData && (
@@ -192,13 +180,13 @@ export default function HomePage() {
                 </div>
               )}
             </form>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Display List of Found Items (Right Side) */}
         <div className={`right-column ${isFormVisible ? "" : "expanded"}`}>
           <h1 className="main-title">Curated Finds</h1>
-          <ListOfFoundThings key={posts.length} items={posts} onDelete={handleDelete} />
+          <ListOfFoundThings items={posts} onDelete={handleDelete} />
         </div>
       </div>
     </div>

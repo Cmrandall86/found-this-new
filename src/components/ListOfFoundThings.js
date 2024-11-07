@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTable, useSortBy, useGlobalFilter } from "react-table";
 
-export default function ListOfFoundThings({ items, onDelete }) {
+export default function ListOfFoundThings({ items, onDelete, isFormVisible, toggleFormVisibility }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [previews, setPreviews] = useState({});
+  const [showMenu, setShowMenu] = useState({});
+  const menuRef = useRef(null);
 
-  // Fetch preview data for an item
   const fetchPreviewData = async (url, itemId) => {
     try {
       const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}`);
@@ -20,7 +21,6 @@ export default function ListOfFoundThings({ items, onDelete }) {
     }
   };
 
-  // Fetch previews for items that don't already have them in the local state
   useEffect(() => {
     items.forEach((item) => {
       if (item.productURL && !previews[item._id]) {
@@ -32,22 +32,8 @@ export default function ListOfFoundThings({ items, onDelete }) {
   const columns = React.useMemo(
     () => [
       { Header: "Title", accessor: "title" },
-      { Header: "Description", accessor: "description" },
-      {
-        Header: "Product URL",
-        accessor: "productURL",
-        Cell: ({ value }) =>
-          value ? (
-            <a href={value} target="_blank" rel="noopener noreferrer">
-              View Product
-            </a>
-          ) : null,
-      },
-      {
-        Header: "Price",
-        accessor: "price",
-        Cell: ({ value }) => (value ? `$${value}` : "N/A"),
-      },
+      { Header: "Product URL", accessor: "productURL" },
+      { Header: "Price", accessor: "price" },
     ],
     []
   );
@@ -66,17 +52,43 @@ export default function ListOfFoundThings({ items, onDelete }) {
   const handleSortChange = (e) => {
     const value = e.target.value;
     if (value === "title") {
-      toggleSortBy("title", false); // Sort by title in ascending order
+      toggleSortBy("title", false);
     } else if (value === "priceLow") {
-      toggleSortBy("price", false); // Sort by price in ascending order (low to high)
+      toggleSortBy("price", false);
     } else if (value === "priceHigh") {
-      toggleSortBy("price", true); // Sort by price in descending order (high to low)
+      toggleSortBy("price", true);
     }
   };
 
+  const toggleMenu = (id) => {
+    setShowMenu((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu({});
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div>
-      {/* Filter and Sort Controls */}
+      {isFormVisible && (
+        <div className="post-form form-visible">
+          <button className="close-form" onClick={toggleFormVisibility}>
+            Close Form
+          </button>
+          <p>Your form content goes here.</p>
+        </div>
+      )}
+
       <div className="filter-controls">
         <input
           type="text"
@@ -92,19 +104,36 @@ export default function ListOfFoundThings({ items, onDelete }) {
         </select>
       </div>
 
-      {/* Card Grid */}
       <div className="grid-container">
         {rows.map((row) => {
           prepareRow(row);
-          const { title, description, productURL, price } = row.original;
+          const { title, productURL, price } = row.original;
           const previewData = previews[row.original._id];
+          const isMenuOpen = showMenu[row.original._id];
 
           return (
             <div className="card" key={row.id}>
-              <h3 className="card-title">{title}</h3>
-              <p className="card-description">{description}</p>
+              <button className="menu-button" onClick={() => toggleMenu(row.original._id)}>
+                ⋮
+              </button>
+              {isMenuOpen && (
+                <div className="card-menu show" ref={menuRef}>
+                  <div className="card-menu-close">
+                    <div className="close-mini">
+                    <button
+                      onClick={() => setShowMenu({})} 
+                      className="close-button" id="close-mini-menu"
+                    >
+                      X
+                    </button>
+                    </div>
+                  </div>
+                  <button className="del-btn" onClick={() => onDelete(row.original._id)}>Delete</button>
+                </div>
+              )}
 
-              {/* Render preview fields */}
+              <h3 className="card-title">{title}</h3>
+
               {previewData?.images && (
                 <div className="preview-thumbnails">
                   {previewData.images.slice(0, 4).map((image, index) => (
@@ -117,18 +146,14 @@ export default function ListOfFoundThings({ items, onDelete }) {
                   ))}
                 </div>
               )}
-              {previewData?.title && <h4 className="preview-title">{previewData.title}</h4>}
-              {previewData?.description && <p className="preview-description">{previewData.description}</p>}
+
+              <p className="card-price">{price ? `$${price}` : "N/A"}</p>
 
               {productURL && (
                 <a href={productURL} target="_blank" rel="noopener noreferrer" className="card-link">
                   View Product
                 </a>
               )}
-              <p className="card-price">{price ? `$${price}` : "N/A"}</p>
-              <button onClick={() => onDelete(row.original._id)} className="card-delete">
-                Delete
-              </button>
             </div>
           );
         })}
