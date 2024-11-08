@@ -292,35 +292,6 @@ body.dark-mode .card-title {
   color: var(--danger-color);
 }
 
-/* Dropdown Menu */
-.card-menu {
-  position: absolute;
-  top: 35px;
-  right: 10px;
-  height: auto;
-  width: 150px;
-  padding: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  display: none;
-  flex-direction: column;
-  z-index: 200;
-  background-color: white;
-}
-
-
-.close-button {
-  background: none;
-  border: none;
-  color: #555;
-  font-size: 1.1rem;
-  cursor: pointer;
-}
-
-.close-button:hover {
-  color: var(--danger-color);
-}
-
 #close-mini {
   display: flex; 
   justify-content: flex-end;
@@ -328,55 +299,6 @@ body.dark-mode .card-title {
 
 #close-mini:hover {
   background-color: transparent;
-}
-
-#close-mini-menu {
-  font-size: 16px;
-  background-color: transparent;
-  border: none;
-  color: var(--black); /* Or any color you prefer */
-  cursor: pointer;
-  width: fit-content;
-}
-
-#close-mini-menu:hover {
-  transform: scale(1.2); 
-  border-radius: 50%;
-}
-
-.del-btn {
-  transform: scale(1.2); 
-
-}
-
-.card-menu.show {
-  display: flex;
-}
-
-.card-menu-close {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 8px;
-}
-
-
-.card-menu button {
-  background: none;
-  border: none;
-  padding: 8px 12px;
-  font-size: 0.9rem;
-  color: var(--danger-color);
-  cursor: pointer;
-  text-align: left;
-  width: 100%;
-
-}
-
-.card-menu button:hover {
-  transform: scale(1.2); 
-
-  /* background-color: var(--danger-hover-bg);
-  color: #fff; */
 }
 
 

@@ -1,0 +1,55 @@
+/* MiniMenu Styles */
+.mini-menu {
+    position: absolute;
+    top: 35px;
+    right: 10px;
+    width: 150px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    background-color: var(--white);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 200;
+    transition: all 0.3s ease;
+  }
+  
+  .mini-menu .close-button {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    color: var(--black);
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  .mini-menu .close-button:hover {
+    color: var(--danger-color);
+  }
+  
+  .mini-menu .menu-action {
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .mini-menu .menu-action:hover {
+    transform: scale(1.05);
+    background-color: var(--light-border);
+  }
+  
+  .mini-menu .delete-action {
+    color: var(--danger-color);
+  }
+  
+  .mini-menu .edit-action {
+    color: var(--primary-color);
+  }
+  

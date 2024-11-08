@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+// src/components/ListOfFoundThings.js
+import React, { useState, useEffect } from "react";
 import { useTable, useSortBy, useGlobalFilter } from "react-table";
+import MiniMenu from "@/components/MiniMenu";
 
 export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [previews, setPreviews] = useState({});
   const [showMenu, setShowMenu] = useState({});
-  const menuRef = useRef(null);
 
   const fetchPreviewData = async (url, itemId) => {
     try {
@@ -34,7 +35,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       { Header: "Title", accessor: "title" },
       { Header: "Product URL", accessor: "productURL" },
       { Header: "Price", accessor: "price" },
-      { Header: "Date Uploaded", accessor: "createdAt" }, // Assuming `createdAt` field in items
+      { Header: "Date Uploaded", accessor: "createdAt" },
     ],
     []
   );
@@ -69,19 +70,6 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     setShowMenu((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setShowMenu({});
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   return (
     <div>
       <div className="filter-controls">
@@ -114,30 +102,11 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
                 ⋮
               </button>
               {isMenuOpen && (
-                <div className="card-menu show" ref={menuRef}>
-                  <div className="card-menu-close">
-                    <button
-                      onClick={() => setShowMenu({})}
-                      className="close-button"
-                      id="close-mini-menu"
-                    >
-                      X
-                    </button>
-                  </div>
-                  <button
-                    className="del-btn"
-                    onClick={() => {
-                      if (window.confirm("Are you sure you want to delete this item?")) {
-                        onDelete(row.original._id);
-                      }
-                    }}
-                  >
-                    Delete
-                  </button>
-                  <button className="edit-btn" onClick={() => onEdit(row.original)}>
-                    Edit
-                  </button>
-                </div>
+                <MiniMenu
+                  onClose={() => setShowMenu({ ...showMenu, [row.original._id]: false })}
+                  onDelete={() => onDelete(row.original._id)}
+                  onEdit={() => onEdit(row.original)}
+                />
               )}
 
               <h3 className="card-title">{title}</h3>
