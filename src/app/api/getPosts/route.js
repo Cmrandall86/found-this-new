@@ -1,5 +1,5 @@
 // src/app/api/getPosts/route.js
-import client from '../../../../lib/sanityClient'; 
+import client from '../../../../lib/sanityClient';
 import { NextResponse } from 'next/server';
 
 export async function GET() {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTable, useSortBy, useGlobalFilter } from "react-table";
 
-export default function ListOfFoundThings({ items, onDelete, isFormVisible, toggleFormVisibility }) {
+export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [previews, setPreviews] = useState({});
   const [showMenu, setShowMenu] = useState({});
@@ -64,7 +64,6 @@ export default function ListOfFoundThings({ items, onDelete, isFormVisible, togg
     setShowMenu((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -80,15 +79,6 @@ export default function ListOfFoundThings({ items, onDelete, isFormVisible, togg
 
   return (
     <div>
-      {isFormVisible && (
-        <div className="post-form form-visible">
-          <button className="close-form" onClick={toggleFormVisibility}>
-            Close Form
-          </button>
-          <p>Your form content goes here.</p>
-        </div>
-      )}
-
       <div className="filter-controls">
         <input
           type="text"
@@ -119,16 +109,27 @@ export default function ListOfFoundThings({ items, onDelete, isFormVisible, togg
               {isMenuOpen && (
                 <div className="card-menu show" ref={menuRef}>
                   <div className="card-menu-close">
-                    <div className="close-mini">
                     <button
-                      onClick={() => setShowMenu({})} 
-                      className="close-button" id="close-mini-menu"
+                      onClick={() => setShowMenu({})}
+                      className="close-button"
+                      id="close-mini-menu"
                     >
                       X
                     </button>
-                    </div>
                   </div>
-                  <button className="del-btn" onClick={() => onDelete(row.original._id)}>Delete</button>
+                  <button
+                    className="del-btn"
+                    onClick={() => {
+                      if (window.confirm("Are you sure you want to delete this item?")) {
+                        onDelete(row.original._id);
+                      }
+                    }}
+                  >
+                    Delete
+                  </button>
+                  <button className="edit-btn" onClick={() => onEdit(row.original)}>
+                    Edit
+                  </button>
                 </div>
               )}
 
