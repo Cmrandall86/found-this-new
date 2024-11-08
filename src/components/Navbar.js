@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function Navbar({ isFormVisible, toggleFormVisibility }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -22,19 +23,29 @@ export default function Navbar({ isFormVisible, toggleFormVisibility }) {
   }, []);
 
   return (
-    <nav className="btns">
-      {/* Conditionally render "Add New Post" button only when form is hidden */}
-      {!isFormVisible && (
-        <button onClick={toggleFormVisibility} className="show-form-button">
-          <span className="plus-icon">+</span>
-        </button>
-      )}
+    <nav className="navbar">
+      <div className="navbar-content">
+        {/* Logo or Title as a Link */}
+        <Link href="/" className="navbar-title">
+          My App
+        </Link>
 
-      {/* Theme Toggle */}
-      <div className="theme-toggle-wrapper">
-        <span className="icon">{isDarkMode ? "🌜" : "☀️"}</span>
-        <div className="theme-toggle" onClick={toggleTheme}>
-          <div className={`toggle-slider ${isDarkMode ? "dark" : ""}`}></div>
+        {/* Right-Side Buttons */}
+        <div className="navbar-actions">
+          {/* "Add New Post" button */}
+          {!isFormVisible && (
+            <button onClick={toggleFormVisibility} className="navbar-button">
+              <span className="plus-icon">+</span>
+            </button>
+          )}
+
+          {/* Theme Toggle */}
+          <div className="theme-toggle-wrapper">
+            <span className="icon">{isDarkMode ? "🌜" : "☀️"}</span>
+            <div className="theme-toggle" onClick={toggleTheme}>
+              <div className={`toggle-slider ${isDarkMode ? "dark" : ""}`}></div>
+            </div>
+          </div>
         </div>
       </div>
     </nav>
