@@ -18,6 +18,7 @@ body.light-mode {
   background-color: var(--background-light);
   color: var(--text-color-light);
   padding: 20px;
+  overflow: hidden; /* Prevent double scrollbars */
 }
 
 body.dark-mode {
@@ -25,6 +26,7 @@ body.dark-mode {
   background-color: var(--background-dark);
   color: var(--text-color-dark);
   padding: 20px;
+  overflow: hidden;
 }
 
 /* Container Flex */
@@ -115,33 +117,48 @@ body.dark-mode .submit-button:hover {
   transform: translateY(-2px);
 }
 
-/* Column Styling */
+/* Left Column (Form) */
 .left-column {
-  flex: 1;
+  position: fixed;
+  top: 100px;
+  left: 20px;
+  width: 30%; /* Adjust width as needed */
+  height: calc(100vh - 110px); 
   background-color: var(--white);
+  overflow-y: auto; /* Enable scrolling within the form if needed */
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px var(--card-shadow-light);
-  transition: all 0.4s ease;
+  border-right: 1px solid var(--border-color-light);
+  box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  z-index: 1000;
 }
 
 body.dark-mode .left-column {
   background-color: var(--dark-form-bg);
+  border-right: 1px solid var(--border-color-dark);
+  box-shadow: 4px 0 8px var(--card-shadow-dark);
 }
 
-body.dark-mode .left-column input,
-body.dark-mode .left-column textarea {
-  color: var(--text-color-dark);
-}
-
-/* Right Column */
+/* Right Column (Content) */
 .right-column {
-  flex: 3;
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  width: 67%;
+  height: calc(100vh - 110px);
   background-color: var(--white);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px var(--card-shadow-light);
-  transition: flex 0.4s ease, padding 0.4s ease, width 0.4s ease;
+  overflow-y: auto; /* Enable scrolling within the content area */
+  margin-bottom: 20px; /* Adjust value as needed */
+
+}
+
+.right-column.expanded {
+  width: calc(100% - 40px); /* Adjusted to occupy the full width with padding */
+  right: 0; /* Align the right column to the edge */
+  padding-right: 20px; /* Keep a bit of padding on the right */
 }
 
 body.dark-mode .right-column {
@@ -168,8 +185,6 @@ body.dark-mode .main-title {
   border-bottom: 2px solid var(--dark-border);
 }
 
-
-
 /* Left Column Hidden and Visible States */
 .left-column {
   flex: 1;
@@ -178,18 +193,17 @@ body.dark-mode .main-title {
   border-radius: 8px;
   box-shadow: 0 4px 8px var(--card-shadow-light);
   transition: all 0.4s ease;
-  display: none;
-  /* Hidden by default */
+  display: none; /* Hidden by default */
+  margin-bottom: 20px; /* Adjust value as needed */
+
 }
 
 .left-column.visible {
-  display: block;
-  /* Show when form is visible */
+  display: block; /* Show when form is visible */
 }
 
 .left-column.hidden {
-  display: none;
-  /* Hide when form is hidden */
+  display: none; /* Hide when form is hidden */
 }
 
 body.dark-mode .left-column {
@@ -198,10 +212,8 @@ body.dark-mode .left-column {
 
 /* Right Column Expanded State */
 .right-column.expanded {
-  flex: 4;
-  /* Increase the width when left-column is hidden */
+  flex: 4; /* Increase the width when left-column is hidden */
 }
-
 
 /* Card Container */
 .grid-container {
@@ -245,14 +257,12 @@ body.dark-mode .sort-select {
   border: 1px solid var(--dark-border);
 }
 
-
 .flex {
   display: flex;
 }
 
 .justify-end {
   justify-content: flex-end;
-  background: red;
 }
 
 /* Responsive Adjustments */
@@ -264,6 +274,8 @@ body.dark-mode .sort-select {
   .left-column,
   .right-column {
     width: 100%;
+    position: static;
+    margin-left: 0;
   }
 
   .show-form-button {

@@ -7,7 +7,7 @@ import UploadForm from '@/components/UploadForm';
 export default function HomePage() {
   const [posts, setPosts] = useState([]);
   const [isFormVisible, setFormVisible] = useState(false);
-  const [editPost, setEditPost] = useState(null); // Track post being edited
+  const [editPost, setEditPost] = useState(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -30,7 +30,6 @@ export default function HomePage() {
   const handleFormSubmit = async (newPost) => {
     try {
       if (editPost) {
-        // Update existing post
         const response = await fetch('/api/updatePost', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -51,7 +50,6 @@ export default function HomePage() {
           console.error('Failed to update post:', response.statusText);
         }
       } else {
-        // Create new post
         const response = await fetch('/api/createPost', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -90,24 +88,20 @@ export default function HomePage() {
   };
 
   const handleEdit = (post) => {
-    setEditPost(post); // Set the post to be edited
-    setFormVisible(true); // Open the form
+    setEditPost(post);
+    setFormVisible(true);
   };
 
   return (
     <div>
       <Navbar isFormVisible={isFormVisible} toggleFormVisibility={handleToggleForm} />
-
       <div className="container-flex">
-        {isFormVisible && (
-          <div className="left-column visible">
-            <div className='close-button-container'>
-              <button onClick={handleToggleForm} className="close-form">X</button>
-            </div>
-            <UploadForm onSubmit={handleFormSubmit} editPost={editPost} />
+        <div className={`left-column ${isFormVisible ? 'visible' : 'hidden'}`}>
+          <div className="close-button-container">
+            <button onClick={handleToggleForm} className="close-form">X</button>
           </div>
-        )}
-
+          {isFormVisible && <UploadForm onSubmit={handleFormSubmit} editPost={editPost} />}
+        </div>
         <div className={`right-column ${isFormVisible ? '' : 'expanded'}`}>
           <h1 className="main-title">Curated Finds</h1>
           <ListOfFoundThings items={posts} onDelete={handleDelete} onEdit={handleEdit} />
