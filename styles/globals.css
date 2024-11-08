@@ -156,9 +156,10 @@ body.dark-mode .left-column {
 }
 
 .right-column.expanded {
-  width: calc(100% - 40px); /* Adjusted to occupy the full width with padding */
+  width: calc(100% - 40px);
   right: 0; /* Align the right column to the edge */
   padding-right: 20px; /* Keep a bit of padding on the right */
+  margin-right: 20px;
 }
 
 body.dark-mode .right-column {
@@ -264,6 +265,44 @@ body.dark-mode .sort-select {
 .justify-end {
   justify-content: flex-end;
 }
+/* Scrollbar Styling */
+.right-column::-webkit-scrollbar {
+  width: 8px;
+}
+
+.right-column::-webkit-scrollbar-track {
+  background-color: var(--background-light); /* light background for the track */
+}
+
+body.dark-mode .right-column::-webkit-scrollbar-track {
+  background-color: var(--background-dark); /* dark background for the track */
+}
+
+.right-column::-webkit-scrollbar-thumb {
+  background-color: rgba(29, 185, 84, 0.5); /* Subtle green thumb with opacity in light mode */
+  border-radius: 8px; /* Rounded scrollbar */
+}
+
+body.dark-mode .right-column::-webkit-scrollbar-thumb {
+  background-color: rgba(29, 185, 84, 0.7); /* Slightly darker in dark mode */
+}
+
+.right-column::-webkit-scrollbar-thumb:hover {
+  background-color: var(--secondary-color-hover);
+}
+
+/* Firefox scrollbar styling */
+.right-column {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(29, 185, 84, 0.5) var(--background-light);
+}
+
+body.dark-mode .right-column {
+  scrollbar-color: rgba(29, 185, 84, 0.7) var(--background-dark);
+}
+
+
+
 
 /* Responsive Adjustments */
 @media (max-width: 1179px) {

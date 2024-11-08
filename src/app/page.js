@@ -1,8 +1,8 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import Navbar from '@/components/Navbar';
-import ListOfFoundThings from '@/components/ListOfFoundThings';
-import UploadForm from '@/components/UploadForm';
+"use client";
+import React, { useState, useEffect } from "react";
+import Navbar from "@/components/Navbar";
+import ListOfFoundThings from "@/components/ListOfFoundThings";
+import UploadForm from "@/components/UploadForm";
 
 export default function HomePage() {
   const [posts, setPosts] = useState([]);
@@ -11,12 +11,12 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await fetch('/api/getPosts');
+      const response = await fetch("/api/getPosts");
       if (response.ok) {
         const data = await response.json();
         setPosts(data);
       } else {
-        console.error('Failed to fetch posts:', response.statusText);
+        console.error("Failed to fetch posts:", response.statusText);
       }
     };
     fetchPosts();
@@ -30,9 +30,9 @@ export default function HomePage() {
   const handleFormSubmit = async (newPost) => {
     try {
       if (editPost) {
-        const response = await fetch('/api/updatePost', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/updatePost", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             ...newPost,
             id: editPost._id,
@@ -43,20 +43,18 @@ export default function HomePage() {
 
         if (response.ok) {
           const updatedPost = await response.json();
-          setPosts((prevPosts) =>
-            prevPosts.map((post) => (post._id === updatedPost._id ? updatedPost : post))
-          );
+          setPosts((prevPosts) => prevPosts.map((post) => (post._id === updatedPost._id ? updatedPost : post)));
         } else {
-          console.error('Failed to update post:', response.statusText);
+          console.error("Failed to update post:", response.statusText);
         }
       } else {
-        const response = await fetch('/api/createPost', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/createPost", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             ...newPost,
             price: Number(newPost.price),
-            authorId: '446810ab-8ae8-4fa2-85bf-46e0d04bd72d',
+            authorId: "446810ab-8ae8-4fa2-85bf-46e0d04bd72d",
           }),
         });
 
@@ -64,26 +62,26 @@ export default function HomePage() {
           const createdPost = await response.json();
           setPosts((prevPosts) => [...prevPosts, createdPost]);
         } else {
-          console.error('Failed to create post:', response.statusText);
+          console.error("Failed to create post:", response.statusText);
         }
       }
       handleToggleForm(); // Hide form after submission
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error("Error submitting form:", error);
     }
   };
 
   const handleDelete = async (postId) => {
     try {
-      const response = await fetch(`/api/deletePost?id=${postId}`, { method: 'DELETE' });
+      const response = await fetch(`/api/deletePost?id=${postId}`, { method: "DELETE" });
 
       if (response.ok) {
         setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
       } else {
-        console.error('Failed to delete post:', response.statusText);
+        console.error("Failed to delete post:", response.statusText);
       }
     } catch (error) {
-      console.error('Error deleting post:', error);
+      console.error("Error deleting post:", error);
     }
   };
 
@@ -93,20 +91,29 @@ export default function HomePage() {
   };
 
   return (
-    <div>
-      <Navbar isFormVisible={isFormVisible} toggleFormVisibility={handleToggleForm} />
-      <div className="container-flex">
-        <div className={`left-column ${isFormVisible ? 'visible' : 'hidden'}`}>
-          <div className="close-button-container">
-            <button onClick={handleToggleForm} className="close-form">X</button>
-          </div>
-          {isFormVisible && <UploadForm onSubmit={handleFormSubmit} editPost={editPost} />}
-        </div>
-        <div className={`right-column ${isFormVisible ? '' : 'expanded'}`}>
-          <h1 className="main-title">Curated Finds</h1>
+<div>
+  <Navbar isFormVisible={isFormVisible} toggleFormVisibility={handleToggleForm} />
+  <div className="container-flex">
+    <div className={`left-column ${isFormVisible ? "visible" : "hidden"}`}>
+      <div className="close-button-container">
+        <button onClick={handleToggleForm} className="close-form">
+          X
+        </button>
+      </div>
+      {isFormVisible && <UploadForm onSubmit={handleFormSubmit} editPost={editPost} />}
+    </div>
+    
+    {/* Outer-scroll wraps only the scrollable content of the right column */}
+    <div className={`right-column ${isFormVisible ? "" : "expanded"}`}>
+      <h1 className="main-title">Curated Finds</h1>
+      <div className="outer-scroll">
+        <div className="inner-scroll">
           <ListOfFoundThings items={posts} onDelete={handleDelete} onEdit={handleEdit} />
         </div>
       </div>
     </div>
+  </div>
+</div>
+
   );
 }
