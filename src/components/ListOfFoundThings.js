@@ -34,6 +34,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       { Header: "Title", accessor: "title" },
       { Header: "Product URL", accessor: "productURL" },
       { Header: "Price", accessor: "price" },
+      { Header: "Date Uploaded", accessor: "createdAt" }, // Assuming `createdAt` field in items
     ],
     []
   );
@@ -57,6 +58,10 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       toggleSortBy("price", false);
     } else if (value === "priceHigh") {
       toggleSortBy("price", true);
+    } else if (value === "dateNewest") {
+      toggleSortBy("createdAt", true);
+    } else if (value === "dateOldest") {
+      toggleSortBy("createdAt", false);
     }
   };
 
@@ -91,6 +96,8 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
           <option value="title">Sort by Title</option>
           <option value="priceLow">Price Low to High</option>
           <option value="priceHigh">Price High to Low</option>
+          <option value="dateNewest">Newest First</option>
+          <option value="dateOldest">Oldest First</option>
         </select>
       </div>
 
