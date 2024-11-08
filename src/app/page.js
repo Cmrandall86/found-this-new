@@ -156,6 +156,7 @@ export default function HomePage() {
     setFormVisible(false);
   };
 
+
   return (
     <div>
       <Navbar isFormVisible={isFormVisible} toggleFormVisibility={toggleFormVisibility} />
