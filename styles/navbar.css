@@ -1,0 +1,131 @@
+@import './variables.css';
+
+/* Navbar Styles */
+.navbar {
+    width: 100%;
+    background-color: var(--background-light);
+    color: var(--text-color-light);
+    padding: 15px 20px;
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 8px var(--card-shadow-light);
+    transition: background-color 0.3s ease;
+  }
+  
+  body.dark-mode .navbar {
+    background-color: var(--dark-form-bg);
+    color: var(--text-color-dark);
+    box-shadow: 0 4px 8px var(--card-shadow-dark);
+  }
+  
+  /* Navbar Content Alignment */
+  .navbar-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    position: relative;
+  }
+  
+  /* Title/Logo Link */
+  .navbar-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  body.dark-mode .navbar-title {
+    color: var(--secondary-color);
+  }
+  
+  /* Right-Side Actions */
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  /* Navbar Button for Adding New Post */
+  .navbar-button {
+    width: 40px;
+    height: 40px;
+    background-color: var(--secondary-color);
+    color: var(--white);
+    border: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 50%;
+    cursor: pointer;
+    position: absolute;
+    right: 100px; /* Position to the left of the theme toggle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px var(--card-shadow-light);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+  
+  .navbar-button:hover {
+    background-color: var(--secondary-color-hover);
+    transform: scale(1.1);
+  }
+  
+  body.dark-mode .navbar-button {
+    box-shadow: 0 4px 8px var(--card-shadow-dark);
+  }
+  
+  /* Theme Toggle */
+  .theme-toggle-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 4px;
+  }
+  
+  .theme-toggle {
+    width: 50px;
+    height: 24px;
+    background-color: var(--border-color-light);
+    border-radius: 15px;
+    position: relative;
+    transition: background-color 0.3s ease;
+  }
+  
+  body.dark-mode .theme-toggle {
+    background-color: var(--border-color-dark);
+  }
+  
+  .toggle-slider {
+    width: 22px;
+    height: 22px;
+    background-color: var(--white);
+    border-radius: 50%;
+    position: absolute;
+    top: 1px;
+    left: 2px;
+    transition: all 0.3s ease;
+  }
+  
+  body.dark-mode .toggle-slider {
+    left: 26px;
+    background-color: var(--secondary-color);
+  }
+  
+  .icon {
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+  }
+  
+  body.light-mode .icon {
+    color: #ffab00;
+  }
+  
+  body.dark-mode .icon {
+    color: #f0e68c;
+  }
