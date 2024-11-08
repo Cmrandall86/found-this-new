@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 import '../../styles/navbar.css'
 
 export default function Navbar({ isFormVisible, toggleFormVisibility }) {
@@ -25,27 +24,23 @@ export default function Navbar({ isFormVisible, toggleFormVisibility }) {
 
   return (
     <nav className="navbar">
-      <div className="navbar-content">
-        {/* Logo or Title as a Link */}
-        <Link href="/" className="navbar-title">
-          My App
-        </Link>
+      <a href="/" className="navbar-title">
+        Curated Finds
+      </a>
 
-        {/* Right-Side Buttons */}
-        <div className="navbar-actions">
-          {/* "Add New Post" button */}
-          {!isFormVisible && (
-            <button onClick={toggleFormVisibility} className="navbar-button">
-              <span className="plus-icon">+</span>
-            </button>
-          )}
+      <div className="navbar-actions">
+        {/* Add New Post Button */}
+        {!isFormVisible && (
+          <button onClick={toggleFormVisibility} className="navbar-button">
+            +
+          </button>
+        )}
 
-          {/* Theme Toggle */}
-          <div className="theme-toggle-wrapper">
-            <span className="icon">{isDarkMode ? "🌜" : "☀️"}</span>
-            <div className="theme-toggle" onClick={toggleTheme}>
-              <div className={`toggle-slider ${isDarkMode ? "dark" : ""}`}></div>
-            </div>
+        {/* Theme Toggle */}
+        <div className="theme-toggle-wrapper" onClick={toggleTheme}>
+          <span className="icon">{isDarkMode ? "🌜" : "☀️"}</span>
+          <div className="theme-toggle">
+            <div className={`toggle-slider ${isDarkMode ? "dark" : ""}`}></div>
           </div>
         </div>
       </div>

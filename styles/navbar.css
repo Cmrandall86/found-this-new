@@ -1,5 +1,3 @@
-@import './variables.css';
-
 /* Navbar Styles */
 .navbar {
     width: 100%;
@@ -7,8 +5,8 @@
     color: var(--text-color-light);
     padding: 15px 20px;
     display: flex;
-    /* justify-content: center; */
     align-items: center;
+    justify-content: space-between;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -22,7 +20,6 @@
     box-shadow: 0 4px 8px var(--card-shadow-dark);
   }
   
-  /* Navbar Content Alignment */
   .navbar-content {
     display: flex;
     align-items: center;
@@ -31,7 +28,6 @@
     position: relative;
   }
   
-  /* Title/Logo Link */
   .navbar-title {
     font-size: 1.5rem;
     font-weight: bold;
@@ -43,7 +39,6 @@
     color: var(--secondary-color);
   }
   
-  /* Right-Side Actions */
   .navbar-actions {
     display: flex;
     align-items: center;
@@ -61,8 +56,6 @@
     font-weight: bold;
     border-radius: 50%;
     cursor: pointer;
-    position: absolute;
-    right: 100px; /* Position to the left of the theme toggle */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -80,7 +73,7 @@
   }
   
   /* Theme Toggle */
-  .theme-toggle-wrapper {
+.theme-toggle-wrapper {
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -113,8 +106,8 @@
   }
   
   body.dark-mode .toggle-slider {
-    left: 26px;
-    background-color: var(--secondary-color);
+    left: 26px; /* Move the slider to the right in dark mode */
+    background-color: var(--secondary-color); /* Adjust to fit your theme */
   }
   
   .icon {
@@ -123,9 +116,10 @@
   }
   
   body.light-mode .icon {
-    color: #ffab00;
+    color: #ffab00; /* Sun color */
   }
   
   body.dark-mode .icon {
-    color: #f0e68c;
+    color: #f0e68c; /* Moon color */
   }
+  

@@ -1,5 +1,6 @@
 // components/UploadForm.js
 import React, { useState } from 'react';
+import '../../styles/uploadform.css'
 
 export default function UploadForm({ onSubmit }) {
   const [newPost, setNewPost] = useState({
