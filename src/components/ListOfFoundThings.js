@@ -1,7 +1,7 @@
 // src/components/ListOfFoundThings.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTable, useSortBy, useGlobalFilter } from "react-table";
-import MiniMenu from "@/components/MiniMenu";
+import ProductCard from "@/components/ProductCard";
 
 export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [globalFilter, setGlobalFilter] = useState("");
@@ -66,10 +66,6 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     }
   };
 
-  const toggleMenu = (id) => {
-    setShowMenu((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
   return (
     <div>
       <div className="filter-controls">
@@ -95,43 +91,20 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
           const { title, productURL, price } = row.original;
           const previewData = previews[row.original._id];
           const isMenuOpen = showMenu[row.original._id];
+          const toggleMenu = () => setShowMenu((prev) => ({ ...prev, [row.original._id]: !prev[row.original._id] }));
 
           return (
-            <div className="card" key={row.id}>
-              <button className="menu-button" onClick={() => toggleMenu(row.original._id)}>
-                ⋮
-              </button>
-              {isMenuOpen && (
-                <MiniMenu
-                  onClose={() => setShowMenu({ ...showMenu, [row.original._id]: false })}
-                  onDelete={() => onDelete(row.original._id)}
-                  onEdit={() => onEdit(row.original)}
-                />
-              )}
-
-              <h3 className="card-title">{title}</h3>
-
-              {previewData?.images && (
-                <div className="preview-thumbnails">
-                  {previewData.images.slice(0, 4).map((image, index) => (
-                    <img
-                      key={index}
-                      src={image}
-                      alt={`Preview ${index + 1}`}
-                      className="preview-thumbnail"
-                    />
-                  ))}
-                </div>
-              )}
-
-              <p className="card-price">{price ? `$${price}` : "N/A"}</p>
-
-              {productURL && (
-                <a href={productURL} target="_blank" rel="noopener noreferrer" className="card-link">
-                  View Product
-                </a>
-              )}
-            </div>
+            <ProductCard
+              key={row.id}
+              title={title}
+              productURL={productURL}
+              price={price}
+              previewData={previewData}
+              isMenuOpen={isMenuOpen}
+              toggleMenu={toggleMenu}
+              onDelete={() => onDelete(row.original._id)}
+              onEdit={() => onEdit(row.original)}
+            />
           );
         })}
       </div>
