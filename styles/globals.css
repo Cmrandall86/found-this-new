@@ -320,45 +320,21 @@ body.dark-mode .right-column {
 }
 
 
-
-
 @media (max-width: 790px) {
-
-  .grid-container {
-    padding: 0;
-  }
-
   .container-flex {
     display: flex;
     flex-direction: column;
-    overflow: auto;
-    margin: 0;
-    padding: 0;
     width: 100%;
+    overflow: auto;
   }
-
   .left-column,
   .right-column {
-    position: static;
     width: 100%;
-  }
-
-  .right-column.expanded {
-    margin-top: 20px;
+    position: relative;
+    margin-top: 0;
     padding: 0;
+  }
+  .right-column.expanded {
     width: 100%;
-  }
-
-  .left-column {
-    margin-top: 20px;
-
-  }
-
-  body.light-mode {
-    overflow: auto;
-  }
-
-  body.dark-mode {
-    overflow: auto;
   }
 }
