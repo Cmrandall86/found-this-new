@@ -319,22 +319,43 @@ body.dark-mode .right-column {
   scrollbar-color: rgba(29, 185, 84, 0.7) var(--background-dark);
 }
 
-
 @media (max-width: 790px) {
+
+  .grid-container {
+    padding: 0;
+  }
+
   .container-flex {
     display: flex;
     flex-direction: column;
-    width: 100%;
     overflow: auto;
+    margin: 0;
+    padding: 0;
+    width: 100%;
   }
+
   .left-column,
   .right-column {
+    position: static;
     width: 100%;
-    position: relative;
-    margin-top: 0;
-    padding: 0;
   }
+
   .right-column.expanded {
+    margin-top: 20px;
+    padding: 0;
     width: 100%;
+  }
+
+  .left-column {
+    margin-top: 20px;
+
+  }
+
+  body.light-mode {
+    overflow: auto;
+  }
+
+  body.dark-mode {
+    overflow: auto;
   }
 }
