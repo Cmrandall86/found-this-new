@@ -339,6 +339,7 @@ body.dark-mode .right-column {
   .right-column {
     position: static;
     width: 100%;
+    height: fit-content;
   }
 
   .right-column.expanded {
