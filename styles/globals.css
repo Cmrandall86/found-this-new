@@ -336,6 +336,10 @@ body.dark-mode .right-column {
 
 @media (max-width: 790px) {
 
+  * {
+    overflow: hidden;
+  }
+
   .grid-container {
     padding: 0;
   }
@@ -347,6 +351,7 @@ body.dark-mode .right-column {
     margin: 0;
     padding: 0;
     width: 100%;
+    height: 100vh;
   }
 
   .left-column,
@@ -359,7 +364,6 @@ body.dark-mode .right-column {
     margin-top: 20px;
     padding: 0;
     width: 100%;
-    min-height: 70vh;
   }
 
   .left-column {
