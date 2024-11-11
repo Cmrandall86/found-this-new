@@ -21,6 +21,11 @@
     color: var(--white);
    }
 
+
+   body.dark-mode input, body.dark-mode textarea{
+    color: var(--white);
+   }
+
   .close-button-container {
     display: flex;
     align-items: center;
@@ -30,6 +35,10 @@
   .close-form:hover {
     color: var(--danger-hover-bg);
   }
+
+  body.dark-mode .close-form:hover  {
+
+   }
   
   .form-group {
     display: flex;

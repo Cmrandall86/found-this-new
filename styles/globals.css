@@ -18,7 +18,8 @@ body.light-mode {
   background-color: var(--background-light);
   color: var(--text-color-light);
   padding: 20px;
-  overflow: hidden; /* Prevent double scrollbars */
+  overflow: hidden;
+  /* Prevent double scrollbars */
 }
 
 body.dark-mode {
@@ -122,10 +123,12 @@ body.dark-mode .submit-button:hover {
   position: fixed;
   top: 100px;
   left: 20px;
-  width: 30%; /* Adjust width as needed */
-  height: calc(100vh - 110px); 
+  width: 30%;
+  /* Adjust width as needed */
+  height: calc(100vh - 110px);
   background-color: var(--white);
-  overflow-y: auto; /* Enable scrolling within the form if needed */
+  overflow-y: auto;
+  /* Enable scrolling within the form if needed */
   padding: 20px;
   border-right: 1px solid var(--border-color-light);
   box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
@@ -150,15 +153,19 @@ body.dark-mode .left-column {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px var(--card-shadow-light);
-  overflow-y: auto; /* Enable scrolling within the content area */
-  margin-bottom: 20px; /* Adjust value as needed */
+  overflow-y: auto;
+  /* Enable scrolling within the content area */
+  margin-bottom: 20px;
+  /* Adjust value as needed */
 
 }
 
 .right-column.expanded {
   width: calc(100% - 40px);
-  right: 0; /* Align the right column to the edge */
-  padding-right: 20px; /* Keep a bit of padding on the right */
+  right: 0;
+  /* Align the right column to the edge */
+  padding-right: 20px;
+  /* Keep a bit of padding on the right */
   margin-right: 20px;
 }
 
@@ -194,17 +201,21 @@ body.dark-mode .main-title {
   border-radius: 8px;
   box-shadow: 0 4px 8px var(--card-shadow-light);
   transition: all 0.4s ease;
-  display: none; /* Hidden by default */
-  margin-bottom: 20px; /* Adjust value as needed */
+  display: none;
+  /* Hidden by default */
+  margin-bottom: 20px;
+  /* Adjust value as needed */
 
 }
 
 .left-column.visible {
-  display: block; /* Show when form is visible */
+  display: block;
+  /* Show when form is visible */
 }
 
 .left-column.hidden {
-  display: none; /* Hide when form is hidden */
+  display: none;
+  /* Hide when form is hidden */
 }
 
 body.dark-mode .left-column {
@@ -213,7 +224,8 @@ body.dark-mode .left-column {
 
 /* Right Column Expanded State */
 .right-column.expanded {
-  flex: 4; /* Increase the width when left-column is hidden */
+  flex: 4;
+  /* Increase the width when left-column is hidden */
 }
 
 /* Card Container */
@@ -265,26 +277,32 @@ body.dark-mode .sort-select {
 .justify-end {
   justify-content: flex-end;
 }
+
 /* Scrollbar Styling */
 .right-column::-webkit-scrollbar {
   width: 8px;
 }
 
 .right-column::-webkit-scrollbar-track {
-  background-color: var(--background-light); /* light background for the track */
+  background-color: var(--background-light);
+  /* light background for the track */
 }
 
 body.dark-mode .right-column::-webkit-scrollbar-track {
-  background-color: var(--background-dark); /* dark background for the track */
+  background-color: var(--background-dark);
+  /* dark background for the track */
 }
 
 .right-column::-webkit-scrollbar-thumb {
-  background-color: rgba(29, 185, 84, 0.5); /* Subtle green thumb with opacity in light mode */
-  border-radius: 8px; /* Rounded scrollbar */
+  background-color: rgba(29, 185, 84, 0.5);
+  /* Subtle green thumb with opacity in light mode */
+  border-radius: 8px;
+  /* Rounded scrollbar */
 }
 
 body.dark-mode .right-column::-webkit-scrollbar-thumb {
-  background-color: rgba(29, 185, 84, 0.7); /* Slightly darker in dark mode */
+  background-color: rgba(29, 185, 84, 0.7);
+  /* Slightly darker in dark mode */
 }
 
 .right-column::-webkit-scrollbar-thumb:hover {
@@ -304,23 +322,43 @@ body.dark-mode .right-column {
 
 
 
-/* Responsive Adjustments */
-@media (max-width: 1179px) {
+@media (max-width: 790px) {
+
+  .grid-container {
+    padding: 0;
+  }
+
   .container-flex {
+    display: flex;
     flex-direction: column;
+    overflow: auto;
+    margin: 0;
+    padding: 0;
+    width: 100%;
   }
 
   .left-column,
   .right-column {
-    width: 100%;
     position: static;
-    margin-left: 0;
+    width: 100%;
   }
 
-  .show-form-button {
-    left: 50%;
-    transform: translateX(-50%);
-    top: auto;
-    bottom: 20px;
+  .right-column.expanded {
+    margin-top: 20px;
+    padding: 0;
+    width: 100%;
+  }
+
+  .left-column {
+    margin-top: 20px;
+
+  }
+
+  body.light-mode {
+    overflow: auto;
+  }
+
+  body.dark-mode {
+    overflow: auto;
   }
 }
