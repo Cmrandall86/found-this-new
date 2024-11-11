@@ -7,6 +7,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [previews, setPreviews] = useState({});
   const [showMenu, setShowMenu] = useState({});
+  const [forceRender, setForceRender] = useState(false); // New state to trigger re-render
 
   const fetchPreviewData = async (url, itemId) => {
     try {
@@ -29,6 +30,13 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       }
     });
   }, [items]);
+
+  // New useEffect to trigger re-render on mobile if items load but aren't displaying
+  useEffect(() => {
+    if (items.length > 0 && !forceRender) {
+      setForceRender(true);
+    }
+  }, [items, forceRender]);
 
   const columns = React.useMemo(
     () => [
