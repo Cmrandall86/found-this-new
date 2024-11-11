@@ -7,7 +7,6 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [previews, setPreviews] = useState({});
   const [showMenu, setShowMenu] = useState({});
-  const fetchedURLs = useRef(new Set()); // Track already fetched URLs
 
   const fetchPreviewData = async (url, itemId) => {
     try {
@@ -25,10 +24,8 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
 
   useEffect(() => {
     items.forEach((item) => {
-      // Only fetch if the productURL hasn't been fetched before
-      if (item.productURL && !fetchedURLs.current.has(item.productURL)) {
+      if (item.productURL && !previews[item._id]) {
         fetchPreviewData(item.productURL, item._id);
-        fetchedURLs.current.add(item.productURL); // Mark URL as fetched
       }
     });
   }, [items]);
