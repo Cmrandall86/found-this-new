@@ -234,19 +234,6 @@ body.dark-mode .left-column {
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
   padding: 20px;
-  min-height: 60vh; /* Adjust as necessary */
-  overflow-x: hidden;
-}
-
-/* Adding a smoother transition effect for image loading */
-.grid-container img {
-  opacity: 0;
-  transition: opacity 0.3s ease-in;
-}
-
-/* Set opacity to 1 once images load */
-.grid-container img.loaded {
-  opacity: 1;
 }
 
 /* Filter Controls */
@@ -255,8 +242,6 @@ body.dark-mode .left-column {
   gap: 10px;
   margin-bottom: 20px;
   align-items: center;
-  padding: 20px;
-  overflow-x: hidden;
 }
 
 .filter-input {
