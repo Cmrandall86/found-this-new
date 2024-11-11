@@ -43,7 +43,9 @@ export default function HomePage() {
 
         if (response.ok) {
           const updatedPost = await response.json();
-          setPosts((prevPosts) => prevPosts.map((post) => (post._id === updatedPost._id ? updatedPost : post)));
+          setPosts((prevPosts) =>
+            prevPosts.map((post) => (post._id === updatedPost._id ? updatedPost : post))
+          );
         } else {
           console.error("Failed to update post:", response.statusText);
         }
@@ -91,29 +93,27 @@ export default function HomePage() {
   };
 
   return (
-<div>
-  <Navbar isFormVisible={isFormVisible} toggleFormVisibility={handleToggleForm} />
-  <div className="container-flex">
-    <div className={`left-column ${isFormVisible ? "visible" : "hidden"}`}>
-      <div className="close-button-container">
-        <button onClick={handleToggleForm} className="close-form">
-          X
-        </button>
-      </div>
-      {isFormVisible && <UploadForm onSubmit={handleFormSubmit} editPost={editPost} />}
-    </div>
-    
-    {/* Outer-scroll wraps only the scrollable content of the right column */}
-    <div className={`right-column ${isFormVisible ? "" : "expanded"}`}>
-      <h1 className="main-title">Curated Finds</h1>
-      <div className="outer-scroll">
-        <div className="inner-scroll">
-          <ListOfFoundThings items={posts} onDelete={handleDelete} onEdit={handleEdit} />
+    <div>
+      <Navbar isFormVisible={isFormVisible} toggleFormVisibility={handleToggleForm} />
+      <div className="container-flex">
+        <div className={`left-column ${isFormVisible ? "visible" : "hidden"}`}>
+          <div className="close-button-container">
+            <button onClick={handleToggleForm} className="close-form">
+              X
+            </button>
+          </div>
+          {isFormVisible && <UploadForm onSubmit={handleFormSubmit} editPost={editPost} />}
+        </div>
+        
+        <div className={`right-column ${isFormVisible ? "" : "expanded"}`}>
+          <h1 className="main-title">Curated Finds</h1>
+          <div className="outer-scroll">
+            <div className="inner-scroll">
+              <ListOfFoundThings items={posts} onDelete={handleDelete} onEdit={handleEdit} />
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
-
   );
 }

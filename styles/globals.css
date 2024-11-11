@@ -18,8 +18,7 @@ body.light-mode {
   background-color: var(--background-light);
   color: var(--text-color-light);
   padding: 20px;
-  overflow: hidden;
-  /* Prevent double scrollbars */
+  overflow: hidden; /* Prevent double scrollbars */
 }
 
 body.dark-mode {
@@ -123,17 +122,23 @@ body.dark-mode .submit-button:hover {
   position: fixed;
   top: 100px;
   left: 20px;
-  width: 30%;
-  /* Adjust width as needed */
+  width: 30%; /* Adjust width as needed */
   height: calc(100vh - 110px);
   background-color: var(--white);
-  overflow-y: auto;
-  /* Enable scrolling within the form if needed */
+  overflow-y: auto; /* Enable scrolling within the form if needed */
   padding: 20px;
   border-right: 1px solid var(--border-color-light);
   box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  opacity: 0; /* Start hidden */
+  transform: translateX(-100%); /* Start off-screen */
   z-index: 1000;
+}
+
+.left-column.visible {
+  /* Slide and fade in when visible */
+  opacity: 1;
+  transform: translateX(0);
 }
 
 body.dark-mode .left-column {
@@ -153,19 +158,14 @@ body.dark-mode .left-column {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px var(--card-shadow-light);
-  overflow-y: auto;
-  /* Enable scrolling within the content area */
-  margin-bottom: 20px;
-  /* Adjust value as needed */
-
+  overflow-y: auto; /* Enable scrolling within the content area */
+  margin-bottom: 20px; /* Adjust value as needed */
 }
 
 .right-column.expanded {
   width: calc(100% - 40px);
-  right: 0;
-  /* Align the right column to the edge */
-  padding-right: 20px;
-  /* Keep a bit of padding on the right */
+  right: 0; /* Align the right column to the edge */
+  padding-right: 20px; /* Keep a bit of padding on the right */
   margin-right: 20px;
 }
 
@@ -180,7 +180,7 @@ body.dark-mode .right-column {
   font-weight: 700;
   text-align: center;
   margin-bottom: 20px;
-  padding: 10px 0;
+  padding: 10px;
   border-bottom: 2px solid var(--border-color-light);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-transform: uppercase;
@@ -194,28 +194,8 @@ body.dark-mode .main-title {
 }
 
 /* Left Column Hidden and Visible States */
-.left-column {
-  flex: 1;
-  background-color: var(--white);
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px var(--card-shadow-light);
-  transition: all 0.4s ease;
-  display: none;
-  /* Hidden by default */
-  margin-bottom: 20px;
-  /* Adjust value as needed */
-
-}
-
-.left-column.visible {
-  display: block;
-  /* Show when form is visible */
-}
-
 .left-column.hidden {
-  display: none;
-  /* Hide when form is hidden */
+  display: none; /* Hide when form is hidden */
 }
 
 body.dark-mode .left-column {
@@ -224,8 +204,7 @@ body.dark-mode .left-column {
 
 /* Right Column Expanded State */
 .right-column.expanded {
-  flex: 4;
-  /* Increase the width when left-column is hidden */
+  flex: 4; /* Increase the width when left-column is hidden */
 }
 
 /* Card Container */
@@ -242,6 +221,7 @@ body.dark-mode .left-column {
   gap: 10px;
   margin-bottom: 20px;
   align-items: center;
+  padding: 20px;
 }
 
 .filter-input {
@@ -284,25 +264,20 @@ body.dark-mode .sort-select {
 }
 
 .right-column::-webkit-scrollbar-track {
-  background-color: var(--background-light);
-  /* light background for the track */
+  background-color: var(--background-light); /* light background for the track */
 }
 
 body.dark-mode .right-column::-webkit-scrollbar-track {
-  background-color: var(--background-dark);
-  /* dark background for the track */
+  background-color: var(--background-dark); /* dark background for the track */
 }
 
 .right-column::-webkit-scrollbar-thumb {
-  background-color: rgba(29, 185, 84, 0.5);
-  /* Subtle green thumb with opacity in light mode */
-  border-radius: 8px;
-  /* Rounded scrollbar */
+  background-color: rgba(29, 185, 84, 0.5); /* Subtle green thumb with opacity in light mode */
+  border-radius: 8px; /* Rounded scrollbar */
 }
 
 body.dark-mode .right-column::-webkit-scrollbar-thumb {
-  background-color: rgba(29, 185, 84, 0.7);
-  /* Slightly darker in dark mode */
+  background-color: rgba(29, 185, 84, 0.7); /* Slightly darker in dark mode */
 }
 
 .right-column::-webkit-scrollbar-thumb:hover {
@@ -319,8 +294,44 @@ body.dark-mode .right-column {
   scrollbar-color: rgba(29, 185, 84, 0.7) var(--background-dark);
 }
 
-@media (max-width: 790px) {
+/* Scrollbar Styling */
+.left-column::-webkit-scrollbar {
+  width: 8px;
+}
 
+.left-column::-webkit-scrollbar-track {
+  background-color: var(--background-light); /* light background for the track */
+}
+
+body.dark-mode .left-column::-webkit-scrollbar-track {
+  background-color: var(--background-dark); /* dark background for the track */
+}
+
+.left-column::-webkit-scrollbar-thumb {
+  background-color: rgba(29, 185, 84, 0.5); /* Subtle green thumb with opacity in light mode */
+  border-radius: 8px; /* Rounded scrollbar */
+}
+
+body.dark-mode .left-column::-webkit-scrollbar-thumb {
+  background-color: rgba(29, 185, 84, 0.7); /* Slightly darker in dark mode */
+}
+
+.left-column::-webkit-scrollbar-thumb:hover {
+  background-color: var(--secondary-color-hover);
+}
+
+/* Firefox scrollbar styling */
+.left-column {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(29, 185, 84, 0.5) var(--background-light);
+}
+
+body.dark-mode .left-column {
+  scrollbar-color: rgba(29, 185, 84, 0.7) var(--background-dark);
+}
+
+/* Responsive adjustments */
+@media (max-width: 790px) {
   .grid-container {
     padding: 0;
   }
@@ -340,6 +351,8 @@ body.dark-mode .right-column {
     position: static;
     width: 100%;
     height: fit-content;
+    transform: none;
+    opacity: 1;
   }
 
   .right-column.expanded {
@@ -350,7 +363,6 @@ body.dark-mode .right-column {
 
   .left-column {
     margin-top: 20px;
-
   }
 
   body.light-mode {
@@ -360,4 +372,25 @@ body.dark-mode .right-column {
   body.dark-mode {
     overflow: auto;
   }
+
+    /* Mobile Form Animation */
+    .left-column {
+      position: fixed;
+      top: 50px;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background-color: var(--white);
+      transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+      box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateX(-100%);
+      overflow-y: auto; /* Enables scrolling within the form on mobile */
+    }
+  
+    .left-column.visible {
+      transform: translateX(0);
+      opacity: 1;
+    }
 }
