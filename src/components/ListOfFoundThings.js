@@ -9,8 +9,6 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [showMenu, setShowMenu] = useState({});
   const fetchedURLs = useRef(new Set()); // Track already fetched URLs
 
-  console.log("Rendering ListOfFoundThings with items:", items); // Log items
-
   const fetchPreviewData = async (url, itemId) => {
     try {
       const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}`);
@@ -26,14 +24,11 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   };
 
   useEffect(() => {
-    if (!items || items.length === 0) {
-      console.log("No items to display"); // Log if items are empty
-      return;
-    }
     items.forEach((item) => {
+      // Only fetch if the productURL hasn't been fetched before
       if (item.productURL && !fetchedURLs.current.has(item.productURL)) {
         fetchPreviewData(item.productURL, item._id);
-        fetchedURLs.current.add(item.productURL);
+        fetchedURLs.current.add(item.productURL); // Mark URL as fetched
       }
     });
   }, [items]);
@@ -49,7 +44,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   );
 
   const { rows, prepareRow, setGlobalFilter: setTableGlobalFilter, toggleSortBy } = useTable(
-    { columns, data: items || [], globalFilter }, // Fallback to empty array if items are undefined
+    { columns, data: items, globalFilter },
     useGlobalFilter,
     useSortBy
   );
@@ -73,10 +68,6 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       toggleSortBy("createdAt", false);
     }
   };
-
-  if (!items || items.length === 0) {
-    return <div>No items available to display.</div>; // Fallback if items are empty
-  }
 
   return (
     <div>
