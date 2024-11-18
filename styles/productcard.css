@@ -124,6 +124,22 @@ body.dark-mode .preview-thumbnail {
   border: 1px solid var(--text-color-dark);
 }
 
+.product-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.product-card-tag {
+  background-color: var(--secondary-color);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+}
+
+
 /* Responsive */
 @media (max-width: 790px) {
   .product-card {

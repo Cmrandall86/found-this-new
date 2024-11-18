@@ -215,6 +215,19 @@ body.dark-mode .left-column {
   padding: 20px;
 }
 
+.tag-filter-select {
+  padding: 8px;
+  border: 1px solid var(--border-color-light);
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+body.dark-mode .tag-filter-select {
+  background-color: var(--dark-form-bg);
+  color: var(--text-color-dark);
+  border: 1px solid var(--dark-border);
+}
+
 /* Filter Controls */
 .filter-controls {
   display: flex;

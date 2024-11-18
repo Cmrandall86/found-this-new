@@ -12,6 +12,7 @@ export async function POST(request) {
       description: data.description,
       productURL: data.productURL,
       price: data.price,
+      tags: data.tags || [], // Add tags
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });

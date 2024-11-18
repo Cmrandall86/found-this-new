@@ -10,6 +10,7 @@ export async function GET() {
       description,
       productURL,
       price,
+      tags, // Include tags in the response
       createdAt,
       updatedAt
     }`;

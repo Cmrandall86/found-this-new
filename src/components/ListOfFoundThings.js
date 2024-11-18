@@ -1,4 +1,3 @@
-// src/components/ListOfFoundThings.js
 import React, { useState, useEffect, useRef } from "react";
 import { useTable, useSortBy, useGlobalFilter } from "react-table";
 import ProductCard from "@/components/ProductCard";
@@ -7,8 +6,11 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [previews, setPreviews] = useState({});
   const [showMenu, setShowMenu] = useState({});
+  const [selectedTag, setSelectedTag] = useState(""); // State for selected tag
+  const [filteredItems, setFilteredItems] = useState(items); // State for filtered items
   const fetchedURLs = useRef(new Set()); // Track already fetched URLs
 
+  // Fetch preview data
   const fetchPreviewData = async (url, itemId) => {
     try {
       const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}`);
@@ -23,15 +25,30 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     }
   };
 
+  // Filter items by tag
+  const handleTagFilter = (tag) => {
+    setSelectedTag(tag);
+    if (tag) {
+      const filtered = items.filter((item) => item.tags?.includes(tag));
+      setFilteredItems(filtered);
+    } else {
+      setFilteredItems(items);
+    }
+  };
+
+  // Fetch previews only for unfetched URLs
   useEffect(() => {
     items.forEach((item) => {
-      // Only fetch if the productURL hasn't been fetched before
       if (item.productURL && !fetchedURLs.current.has(item.productURL)) {
         fetchPreviewData(item.productURL, item._id);
         fetchedURLs.current.add(item.productURL); // Mark URL as fetched
       }
     });
+    setFilteredItems(items); // Reset filtered items when items change
   }, [items]);
+
+  // Extract unique tags
+  const uniqueTags = [...new Set(items.flatMap((item) => item.tags || []))];
 
   const columns = React.useMemo(
     () => [
@@ -44,7 +61,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   );
 
   const { rows, prepareRow, setGlobalFilter: setTableGlobalFilter, toggleSortBy } = useTable(
-    { columns, data: items, globalFilter },
+    { columns, data: filteredItems, globalFilter },
     useGlobalFilter,
     useSortBy
   );
@@ -71,6 +88,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
 
   return (
     <div>
+      {/* Filter Controls */}
       <div className="filter-controls">
         <input
           type="text"
@@ -86,15 +104,29 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
           <option value="dateNewest">Newest First</option>
           <option value="dateOldest">Oldest First</option>
         </select>
+        <select
+          onChange={(e) => handleTagFilter(e.target.value)}
+          value={selectedTag}
+          className="tag-filter-select"
+        >
+          <option value="">All Tags</option>
+          {uniqueTags.map((tag) => (
+            <option key={tag} value={tag}>
+              {tag}
+            </option>
+          ))}
+        </select>
       </div>
 
+      {/* Product Cards */}
       <div className="grid-container">
         {rows.map((row) => {
           prepareRow(row);
-          const { title, productURL, price } = row.original;
+          const { title, productURL, price, tags } = row.original;
           const previewData = previews[row.original._id];
           const isMenuOpen = showMenu[row.original._id];
-          const toggleMenu = () => setShowMenu((prev) => ({ ...prev, [row.original._id]: !prev[row.original._id] }));
+          const toggleMenu = () =>
+            setShowMenu((prev) => ({ ...prev, [row.original._id]: !prev[row.original._id] }));
 
           return (
             <ProductCard
@@ -107,6 +139,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               toggleMenu={toggleMenu}
               onDelete={() => onDelete(row.original._id)}
               onEdit={() => onEdit(row.original)}
+              tags={tags} // Pass tags to ProductCard
             />
           );
         })}

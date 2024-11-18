@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import '../../styles/globals.css'
-import '../../styles/uploadform.css'
+import '../../styles/globals.css';
+import '../../styles/uploadform.css';
 
 export default function UploadForm({ onSubmit, editPost }) {
   const [formValues, setFormValues] = useState({
@@ -8,16 +8,17 @@ export default function UploadForm({ onSubmit, editPost }) {
     description: '',
     productURL: '',
     price: '',
+    tags: '', // Field for tags
   });
 
   useEffect(() => {
     if (editPost) {
-      // Pre-fill form with data when editing
       setFormValues({
-        title: editPost.title,
-        description: editPost.description,
-        productURL: editPost.productURL,
-        price: editPost.price,
+        title: editPost.title || '',
+        description: editPost.description || '',
+        productURL: editPost.productURL || '',
+        price: editPost.price || '',
+        tags: editPost.tags ? editPost.tags.join(', ') : '', // Convert tags array to a comma-separated string
       });
     }
   }, [editPost]);
@@ -29,8 +30,11 @@ export default function UploadForm({ onSubmit, editPost }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formValues); // Pass form values to the parent
-    setFormValues({ title: '', description: '', productURL: '', price: '' }); // Clear form
+    onSubmit({
+      ...formValues,
+      tags: formValues.tags.split(',').map((tag) => tag.trim()), // Convert comma-separated string to array
+    });
+    setFormValues({ title: '', description: '', productURL: '', price: '', tags: '' }); // Reset form
   };
 
   return (
@@ -78,6 +82,17 @@ export default function UploadForm({ onSubmit, editPost }) {
           value={formValues.price}
           onChange={handleChange}
           required
+          className="form-input"
+        />
+      </div>
+      <div className="form-group">
+        <label htmlFor="tags" className="form-label">Tags (comma-separated):</label>
+        <input
+          type="text"
+          id="tags"
+          name="tags"
+          value={formValues.tags}
+          onChange={handleChange}
           className="form-input"
         />
       </div>
