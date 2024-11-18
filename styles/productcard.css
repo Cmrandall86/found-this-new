@@ -128,13 +128,13 @@ body.dark-mode .preview-thumbnail {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 10px;
+  margin: 10px 0;
 }
 
 .product-card-tag {
   background-color: var(--secondary-color);
   color: white;
-  padding: 4px 8px;
+  padding: 6px 10px;
   border-radius: 12px;
   font-size: 0.8rem;
 }

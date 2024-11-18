@@ -210,6 +210,56 @@ body.dark-mode .main-title {
   border-bottom: 2px solid var(--dark-border);
 }
 
+/* Scrollbar Styling */
+.right-column::-webkit-scrollbar,
+.left-column::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.right-column::-webkit-scrollbar-track,
+.left-column::-webkit-scrollbar-track {
+  background-color: var(--background-light); /* Light background for the track */
+  border-radius: 8px; /* Match the column's border-radius */
+}
+
+body.dark-mode .right-column::-webkit-scrollbar-track,
+body.dark-mode .left-column::-webkit-scrollbar-track {
+  background-color: var(--background-dark); /* Dark background for the track */
+  border-radius: 8px; /* Match the column's border-radius */
+}
+
+.right-column::-webkit-scrollbar-thumb,
+.left-column::-webkit-scrollbar-thumb {
+  background-color: rgba(29, 185, 84, 0.5); /* Subtle green thumb with opacity in light mode */
+  border-radius: 8px; /* Rounded scrollbar thumb */
+}
+
+body.dark-mode .right-column::-webkit-scrollbar-thumb,
+body.dark-mode .left-column::-webkit-scrollbar-thumb {
+  background-color: rgba(29, 185, 84, 0.7); /* Slightly darker in dark mode */
+  border-radius: 8px; /* Rounded scrollbar thumb */
+}
+
+.right-column::-webkit-scrollbar-thumb:hover,
+.left-column::-webkit-scrollbar-thumb:hover {
+  background-color: var(--secondary-color-hover); /* Highlight thumb on hover */
+}
+
+/* Firefox scrollbar styling */
+.right-column,
+.left-column {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(29, 185, 84, 0.5) var(--background-light);
+  border-radius: 8px; /* Ensures border-radius is applied */
+}
+
+body.dark-mode .right-column,
+body.dark-mode .left-column {
+  scrollbar-color: rgba(29, 185, 84, 0.7) var(--background-dark);
+  border-radius: 8px; /* Ensures border-radius is applied */
+}
+
+
 /* Responsive adjustments */
 @media (max-width: 790px) {
   .grid-container {
