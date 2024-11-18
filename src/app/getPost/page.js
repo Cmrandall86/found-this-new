@@ -50,7 +50,6 @@ export default function FoundThingsPage() {
         <p>Loading...</p>
       ) : (
         <>
-        {console.log(items)}
         <ListOfFoundThings items={items} onDelete={handleDelete} />
         </>
       )}

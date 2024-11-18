@@ -1,0 +1,88 @@
+/* Grid Container for Product Cards */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  /* Filter Controls */
+  .filter-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .filter-input {
+    padding: 8px;
+    border: 1px solid var(--border-color-light);
+    border-radius: 4px;
+    flex: 1;
+  }
+  
+  body.dark-mode .filter-input {
+    background-color: var(--dark-form-bg);
+    color: var(--text-color-dark);
+    border: 1px solid var(--dark-border);
+  }
+  
+  .sort-select {
+    padding: 8px;
+    border: 1px solid var(--border-color-light);
+    border-radius: 4px;
+    width: 20%;
+  }
+  
+  body.dark-mode .sort-select {
+    background-color: var(--dark-form-bg);
+    color: var(--text-color-dark);
+    border: 1px solid var(--dark-border);
+  }
+  
+  .tag-filter-select {
+    padding: 8px;
+    border: 1px solid var(--border-color-light);
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  body.dark-mode .tag-filter-select {
+    background-color: var(--dark-form-bg);
+    color: var(--text-color-dark);
+    border: 1px solid var(--dark-border);
+  }
+  
+  /* Responsive Filters and Search */
+  @media (max-width: 790px) {
+    .filter-controls {
+      flex-direction: column;
+      gap: 15px;
+      width: 100%;
+      align-items: stretch;
+    }
+  
+    .filter-input,
+    .sort-select {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  
+    .filter-input {
+      border-radius: 6px;
+    }
+  
+    .sort-select {
+      border-radius: 6px;
+      background-color: var(--background-light);
+    }
+  
+    body.dark-mode .sort-select {
+      background-color: var(--background-dark);
+      color: var(--text-color-dark);
+    }
+  }
+  

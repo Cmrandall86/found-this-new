@@ -1,24 +1,24 @@
 /* Navbar Styles */
 .navbar {
-    width: 100%;
-    background-color: var(--background-light);
-    color: var(--text-color-light);
-    padding: 15px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 2000;
-    box-shadow: 0 4px 8px var(--card-shadow-light);
-    transition: background-color 0.3s ease;
-  }
-  
-  body.dark-mode .navbar {
-    background-color: var(--dark-form-bg);
-    color: var(--text-color-dark);
-    box-shadow: 0 4px 8px var(--card-shadow-dark);
-  }
+  width: 100%;
+  background-color: var(--background-light);
+  color: var(--text-color-light);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 2000;
+  box-shadow: 0 4px 8px var(--card-shadow-light);
+  position: fixed; /* Change from sticky to fixed */
+  top: 0; /* Ensure it's fixed at the top */
+  left: 0; /* Align to the left */
+}
+
+body.dark-mode .navbar {
+  background-color: var(--dark-form-bg);
+  color: var(--text-color-dark);
+  box-shadow: 0 4px 8px var(--card-shadow-dark);
+}
   
   .navbar-content {
     display: flex;
@@ -29,7 +29,7 @@
   }
   
   .navbar-title {
-    font-size: clamp(4vw, 1.5rem, 5vw);
+    font-size: clamp(26px, 4vw, 44px);
     font-weight: bold;
     color: var(--primary-color);
     text-decoration: none;
@@ -124,3 +124,10 @@
     color: #f0e68c; /* Moon color */
   }
   
+  @media (max-width: 790px) {
+
+    .navbar {
+      padding: 8px 15px; /* Adjust padding for smaller screens */
+    }
+  }
+

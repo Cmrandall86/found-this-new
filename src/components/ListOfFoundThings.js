@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTable, useSortBy, useGlobalFilter } from "react-table";
 import ProductCard from "@/components/ProductCard";
+import '../../styles/ListOfFoundThings.css'
 
 export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [globalFilter, setGlobalFilter] = useState("");

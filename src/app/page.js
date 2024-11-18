@@ -93,9 +93,9 @@ export default function HomePage() {
   };
 
   return (
-    <div>
+    <div className="homePage">
       <Navbar isFormVisible={isFormVisible} toggleFormVisibility={handleToggleForm} />
-      <div className="container-flex">
+      <div className="container-flex content">
         <div className={`left-column ${isFormVisible ? "visible" : "hidden"}`}>
           <div className="close-button-container">
             <button onClick={handleToggleForm} className="close-form">
