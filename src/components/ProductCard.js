@@ -15,9 +15,15 @@ export default function ProductCard({
   tags,
 }) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [imageSrc, setImageSrc] = useState(previewData?.images[0] || "https://via.placeholder.com/300x200?text=No+Image");
 
   const handleImageLoad = () => {
     setIsImageLoaded(true);
+  };
+
+  const handleImageError = () => {
+    setImageSrc("https://via.placeholder.com/300x200?text=No+Image");
+    setIsImageLoaded(true); // Ensure loading state is cleared
   };
 
   return (
@@ -29,23 +35,22 @@ export default function ProductCard({
         {isMenuOpen && <MiniMenu onClose={toggleMenu} onDelete={onDelete} onEdit={onEdit} ref={menuRef} />}
       </div>
       <div className="image-container">
-        {/* Show placeholder until image is loaded */}
         {!isImageLoaded && <div className="image-placeholder">Loading...</div>}
         <img
-          src={previewData?.images[0]}
+          src={imageSrc}
           alt={previewData?.description || "Product image"}
           className={`preview-thumbnail ${isImageLoaded ? "loaded" : ""}`}
           onLoad={handleImageLoad}
+          onError={handleImageError}
           loading="lazy"
         />
       </div>
       <h3 className="product-card-title">{title}</h3>
       <p className="product-card-price">{price ? `$${price}` : "N/A"}</p>
-      {/* Render tags only if tags exist and have valid values */}
       {tags?.filter((tag) => tag.trim() !== "").length > 0 && (
         <div className="product-card-tags">
           {tags
-            .filter((tag) => tag.trim() !== "") // Remove empty tags
+            .filter((tag) => tag.trim() !== "")
             .map((tag, index) => (
               <span key={index} className="product-card-tag">
                 {tag}
