@@ -11,7 +11,6 @@
   align-items: center;
   text-align: center;
   height: 300px;
-  /* Adjusted height */
   width: 100%;
 }
 
@@ -66,7 +65,7 @@ body.dark-mode .product-card-title {
   position: absolute;
   top: 10px;
   right: 10px;
-  z-index: 2; /* Ensure the button is above the image */
+  z-index: 2;
 }
 
 .menu-button {
@@ -83,7 +82,7 @@ body.dark-mode .product-card-title {
   cursor: pointer;
   color: var(--text-color-light);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 3; /* Ensure it stays above everything */
+  z-index: 3;
 }
 
 .menu-button:hover {
@@ -102,18 +101,53 @@ body.dark-mode .menu-button {
   align-items: center;
   margin-bottom: 10px;
   width: 100%;
-  height: 120px; /* Reduced height */
+  height: 120px;
   overflow: hidden;
   border-radius: 8px;
+  position: relative;
+}
+
+.image-placeholder {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #888;
+  font-size: 14px;
+  animation: pulse 1.5s infinite;
+}
+
+/* Pulse Animation for Loading */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
 }
 
 .preview-thumbnail {
   width: auto;
   height: 100%;
-  max-width: 100%; /* Prevents over-expansion */
-  object-fit: contain; /* Ensure it looks sharp without distorting */
-  transition: transform 0.2s ease;
+  max-width: 100%;
+  object-fit: contain;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+  opacity: 0; /* Start invisible */
   border-radius: 8px;
+}
+
+.preview-thumbnail.loaded {
+  opacity: 1; /* Fade in when loaded */
 }
 
 .preview-thumbnail:hover {
@@ -124,6 +158,7 @@ body.dark-mode .preview-thumbnail {
   border: 1px solid var(--text-color-dark);
 }
 
+/* Tags */
 .product-card-tags {
   display: flex;
   flex-wrap: wrap;
@@ -139,14 +174,13 @@ body.dark-mode .preview-thumbnail {
   font-size: 0.8rem;
 }
 
-
 /* Responsive */
 @media (max-width: 790px) {
   .product-card {
-    height: 280px; /* Adjusted for mobile screens */
+    height: 280px;
   }
 
   .image-container {
-    height: 100px; /* Reduced height for smaller screens */
+    height: 100px;
   }
 }
