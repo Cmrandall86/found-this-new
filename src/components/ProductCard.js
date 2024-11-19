@@ -15,16 +15,18 @@ export default function ProductCard({
   tags,
 }) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [imageSrc, setImageSrc] = useState(previewData?.images[0] || "https://via.placeholder.com/300x200?text=No+Image");
 
   const handleImageLoad = () => {
     setIsImageLoaded(true);
   };
 
-  const handleImageError = () => {
-    setImageSrc("https://via.placeholder.com/300x200?text=No+Image");
-    setIsImageLoaded(true); // Ensure loading state is cleared
+  const handleImageError = (e) => {
+    e.target.src = "https://via.placeholder.com/300x200?text=No+Image";
+    setIsImageLoaded(true); // Mark as loaded to hide the loading animation
   };
+
+  const imageSrc =
+    previewData?.images?.[0] || "https://via.placeholder.com/300x200?text=No+Image";
 
   return (
     <div className="product-card">
@@ -32,13 +34,20 @@ export default function ProductCard({
         <button className="menu-button" onClick={toggleMenu}>
           ⋮
         </button>
-        {isMenuOpen && <MiniMenu onClose={toggleMenu} onDelete={onDelete} onEdit={onEdit} ref={menuRef} />}
+        {isMenuOpen && (
+          <MiniMenu
+            onClose={toggleMenu}
+            onDelete={onDelete}
+            onEdit={onEdit}
+            ref={menuRef}
+          />
+        )}
       </div>
       <div className="image-container">
         {!isImageLoaded && <div className="image-placeholder">Loading...</div>}
         <img
           src={imageSrc}
-          alt={previewData?.description || "Product image"}
+          alt={previewData?.description || "No preview available"}
           className={`preview-thumbnail ${isImageLoaded ? "loaded" : ""}`}
           onLoad={handleImageLoad}
           onError={handleImageError}
@@ -59,7 +68,12 @@ export default function ProductCard({
         </div>
       )}
       {productURL && (
-        <a href={productURL} target="_blank" rel="noopener noreferrer" className="product-card-link">
+        <a
+          href={productURL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="product-card-link"
+        >
           View Product
         </a>
       )}

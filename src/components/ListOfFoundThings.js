@@ -8,25 +8,62 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [previews, setPreviews] = useState({});
   const [showMenu, setShowMenu] = useState({});
   const [selectedTag, setSelectedTag] = useState(""); // State for selected tag
-  const [filteredItems, setFilteredItems] = useState(items); // State for filtered items
-  const fetchedURLs = useRef(new Set()); // Track already fetched URLs
+  const [filteredItems, setFilteredItems] = useState(items);
+  const fetchedURLs = useRef(new Set());
+  const isMounted = useRef(true); // Track whether the component is mounted
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   // Fetch preview data
   const fetchPreviewData = async (url, itemId) => {
+    if (!url) {
+      console.warn("No URL provided for preview fetch");
+      return;
+    }
+  
     try {
-      const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}`);
-      const data = await response.json();
-      if (response.ok) {
-        setPreviews((prev) => ({ ...prev, [itemId]: data }));
-      } else {
-        console.error("Failed to fetch preview data:", data.error);
+      const response = await fetch(
+        `/api/fetchPreview?url=${encodeURIComponent(url)}`
+      );
+  
+      if (!response.ok) {
+        console.error(
+          `Failed to fetch preview for URL: ${url}, Status: ${response.status}`
+        );
+        setPreviews((prev) => ({
+          ...prev,
+          [itemId]: {
+            title: "No Preview Available",
+            description: "Unable to fetch preview data.",
+            images: ["https://via.placeholder.com/300x200?text=No+Image"],
+          },
+        }));
+        return;
       }
+  
+      const data = await response.json();
+      setPreviews((prev) => ({
+        ...prev,
+        [itemId]: data,
+      }));
     } catch (error) {
-      console.error("Error fetching preview data:", error);
+      console.error(`Error fetching preview for URL: ${url}`, error.message);
+      setPreviews((prev) => ({
+        ...prev,
+        [itemId]: {
+          title: "No Preview Available",
+          description: "Unable to fetch preview data.",
+          images: ["https://via.placeholder.com/300x200?text=No+Image"],
+        },
+      }));
     }
   };
-
-  // Filter items by tag
+  
   const handleTagFilter = (tag) => {
     setSelectedTag(tag);
     if (tag) {
@@ -37,20 +74,19 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     }
   };
 
-  // Fetch previews only for unfetched URLs
   useEffect(() => {
     items.forEach((item) => {
       if (item.productURL && !fetchedURLs.current.has(item.productURL)) {
         fetchPreviewData(item.productURL, item._id);
-        fetchedURLs.current.add(item.productURL); // Mark URL as fetched
+        fetchedURLs.current.add(item.productURL);
       }
     });
-    setFilteredItems(items); // Reset filtered items when items change
+    setFilteredItems(items);
   }, [items]);
 
-  // Extract unique tags
-  const uniqueTags = [...new Set(items.flatMap((item) => item.tags || []))]
-  .filter((tag) => tag.trim() !== ''); // Remove empty tags
+  const uniqueTags = [...new Set(items.flatMap((item) => item.tags || []))].filter(
+    (tag) => tag.trim() !== ""
+  );
 
   const columns = React.useMemo(
     () => [
@@ -62,20 +98,11 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     []
   );
 
-  const {
-    rows,
-    prepareRow,
-    setGlobalFilter: setTableGlobalFilter,
-    toggleSortBy,
-  } = useTable(
-    { columns, data: filteredItems, globalFilter },
-    useGlobalFilter,
-    useSortBy
-  );
+  const { rows, prepareRow, setGlobalFilter: setTableGlobalFilter, toggleSortBy } =
+    useTable({ columns, data: filteredItems, globalFilter }, useGlobalFilter, useSortBy);
 
-  // Set default sorting to "dateNewest" when the component mounts
   useEffect(() => {
-    toggleSortBy("createdAt", true); // true = descending (newest first)
+    toggleSortBy("createdAt", true);
   }, [toggleSortBy]);
 
   const handleSearch = (e) => {
@@ -100,7 +127,6 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
 
   return (
     <div>
-      {/* Filter Controls */}
       <div className="filter-controls">
         <input
           type="text"
@@ -110,7 +136,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
           className="filter-input"
         />
         <select onChange={handleSortChange} className="sort-select" defaultValue="dateNewest">
-          <option value="title">{`Sort (A-Z)`}</option>
+          <option value="title">Sort (A-Z)</option>
           <option value="priceLow">Price Low to High</option>
           <option value="priceHigh">Price High to Low</option>
           <option value="dateNewest">Newest First</option>
@@ -130,7 +156,6 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
         </select>
       </div>
 
-      {/* Product Cards */}
       <div className="grid-container">
         {rows.map((row) => {
           prepareRow(row);
@@ -138,7 +163,10 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
           const previewData = previews[row.original._id];
           const isMenuOpen = showMenu[row.original._id];
           const toggleMenu = () =>
-            setShowMenu((prev) => ({ ...prev, [row.original._id]: !prev[row.original._id] }));
+            setShowMenu((prev) => ({
+              ...prev,
+              [row.original._id]: !prev[row.original._id],
+            }));
 
           return (
             <ProductCard
@@ -151,7 +179,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               toggleMenu={toggleMenu}
               onDelete={() => onDelete(row.original._id)}
               onEdit={() => onEdit(row.original)}
-              tags={tags} // Pass tags to ProductCard
+              tags={tags}
             />
           );
         })}
