@@ -42,15 +42,15 @@ export default function ProductCard({
       <h3 className="product-card-title">{title}</h3>
       <p className="product-card-price">{price ? `$${price}` : "N/A"}</p>
       {/* Render tags only if tags exist and have valid values */}
-      {tags?.length > 0 && tags.some(tag => tag.trim() !== "") && (
+      {tags?.filter((tag) => tag.trim() !== "").length > 0 && (
         <div className="product-card-tags">
-          {tags.map((tag, index) =>
-            tag.trim() ? (
+          {tags
+            .filter((tag) => tag.trim() !== "") // Remove empty tags
+            .map((tag, index) => (
               <span key={index} className="product-card-tag">
                 {tag}
               </span>
-            ) : null
-          )}
+            ))}
         </div>
       )}
       {productURL && (

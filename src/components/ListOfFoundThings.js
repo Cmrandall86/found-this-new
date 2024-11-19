@@ -49,7 +49,8 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   }, [items]);
 
   // Extract unique tags
-  const uniqueTags = [...new Set(items.flatMap((item) => item.tags || []))];
+  const uniqueTags = [...new Set(items.flatMap((item) => item.tags || []))]
+  .filter((tag) => tag.trim() !== ''); // Remove empty tags
 
   const columns = React.useMemo(
     () => [

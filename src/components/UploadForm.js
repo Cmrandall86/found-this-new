@@ -30,12 +30,19 @@ export default function UploadForm({ onSubmit, editPost }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const filteredTags = formValues.tags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter((tag) => tag !== ''); // Remove empty strings
+  
     onSubmit({
       ...formValues,
-      tags: formValues.tags.split(',').map((tag) => tag.trim()), // Convert comma-separated string to array
+      tags: filteredTags, // Use filtered tags
     });
-    setFormValues({ title: '', description: '', productURL: '', price: '', tags: '' }); // Reset form
-  };
+  
+    // Reset form
+    setFormValues({ title: '', description: '', productURL: '', price: '', tags: '' });
+  }
 
   return (
     <form onSubmit={handleSubmit} className="post-form">
