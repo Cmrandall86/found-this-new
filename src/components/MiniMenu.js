@@ -1,6 +1,6 @@
 // src/components/MiniMenu.js
 import React, { useRef, useEffect } from "react";
-import '../../styles/minimenu.css'
+import "../../styles/minimenu.css";
 
 export default function MiniMenu({ onDelete, onEdit, onClose }) {
   const menuRef = useRef(null);
@@ -29,12 +29,19 @@ export default function MiniMenu({ onDelete, onEdit, onClose }) {
         onClick={() => {
           if (window.confirm("Are you sure you want to delete this item?")) {
             onDelete();
+            onClose(); // Close the menu after deleting
           }
         }}
       >
         Delete
       </button>
-      <button className="menu-action edit-action" onClick={onEdit}>
+      <button
+        className="menu-action edit-action"
+        onClick={() => {
+          onEdit(); // Perform the edit action
+          onClose(); // Close the menu after clicking Edit
+        }}
+      >
         Edit
       </button>
     </div>

@@ -160,7 +160,7 @@ body.dark-mode .left-column {
 /* Right Column (Content) */
 .right-column {
   position: fixed;
-  top: 100px;
+  top: 90px;
   right: 20px;
   width: 67%;
   height: calc(100vh - 110px);
@@ -277,7 +277,7 @@ body.dark-mode .left-column {
   .right-column.expanded {
     width: 100%;
     padding-right: 0;
-    margin-right: 0;
+    margin-right: 5px;
     top: 32px;
   }
 }

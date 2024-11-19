@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTable, useSortBy, useGlobalFilter } from "react-table";
 import ProductCard from "@/components/ProductCard";
-import '../../styles/ListOfFoundThings.css'
+import "../../styles/ListOfFoundThings.css";
 
 export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [globalFilter, setGlobalFilter] = useState("");
@@ -61,11 +61,21 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     []
   );
 
-  const { rows, prepareRow, setGlobalFilter: setTableGlobalFilter, toggleSortBy } = useTable(
+  const {
+    rows,
+    prepareRow,
+    setGlobalFilter: setTableGlobalFilter,
+    toggleSortBy,
+  } = useTable(
     { columns, data: filteredItems, globalFilter },
     useGlobalFilter,
     useSortBy
   );
+
+  // Set default sorting to "dateNewest" when the component mounts
+  useEffect(() => {
+    toggleSortBy("createdAt", true); // true = descending (newest first)
+  }, [toggleSortBy]);
 
   const handleSearch = (e) => {
     setGlobalFilter(e.target.value);
@@ -98,7 +108,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
           onChange={handleSearch}
           className="filter-input"
         />
-        <select onChange={handleSortChange} className="sort-select">
+        <select onChange={handleSortChange} className="sort-select" defaultValue="dateNewest">
           <option value="title">{`Sort (A-Z)`}</option>
           <option value="priceLow">Price Low to High</option>
           <option value="priceHigh">Price High to Low</option>
