@@ -4,11 +4,3 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-[[headers]]
-  for = "/*" # Apply headers to all routes
-  [headers.values]
-    Permissions-Policy = "accelerometer=(), geolocation=(), microphone=()"
-    # Add any other headers you need here, e.g.:
-    # X-Frame-Options = "DENY"
-    # Content-Security-Policy = "default-src 'self';"

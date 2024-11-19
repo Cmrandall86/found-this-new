@@ -10,7 +10,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Permissions-Policy',
-            value: 'accelerometer=(), geolocation=(), microphone=()', // Add only valid and required policies
+            value: 'accelerometer=(), geolocation=(), microphone=(), camera=()', // Add valid policies
           },
         ],
       },
