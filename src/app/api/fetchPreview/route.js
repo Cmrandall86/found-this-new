@@ -24,7 +24,7 @@ export async function GET(request) {
 
   try {
     // Fetch link preview data with a timeout
-    const previewData = await withTimeout(getLinkPreview(url), 5000);
+    const previewData = await withTimeout(getLinkPreview(url), 7000);
 
     // Filter and prioritize high-quality Amazon product images
     const productImages = (previewData.images || [])
@@ -35,8 +35,6 @@ export async function GET(request) {
           .replace(/(_SX\d+_)/, "_SL500_") // Replace `_SX` patterns with `_SL500_`
       )
       .slice(0, 4); // Limit to 4 images
-
-    console.log("Processed Images:", productImages);
 
     return NextResponse.json({
       title: previewData.title || "No title available",
