@@ -27,32 +27,17 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     }
   
     try {
-      const response = await fetch(
-        `/api/fetchPreview?url=${encodeURIComponent(url)}`
-      );
+      // Debounce by adding delay
+      await new Promise((resolve) => setTimeout(resolve, 100));
   
+      const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}`);
       if (!response.ok) {
-        console.error(
-          `Failed to fetch preview for URL: ${url}, Status: ${response.status}`
-        );
-        setPreviews((prev) => ({
-          ...prev,
-          [itemId]: {
-            title: "No Preview Available",
-            description: "Unable to fetch preview data.",
-            images: ["https://via.placeholder.com/300x200?text=No+Image"],
-          },
-        }));
-        return;
+        throw new Error(`Failed to fetch preview for URL: ${url}, Status: ${response.status}`);
       }
-  
       const data = await response.json();
-      setPreviews((prev) => ({
-        ...prev,
-        [itemId]: data,
-      }));
+      setPreviews((prev) => ({ ...prev, [itemId]: data }));
     } catch (error) {
-      console.error(`Error fetching preview for URL: ${url}`, error.message);
+      console.error(`Error fetching preview for URL ${url}:`, error.message);
       setPreviews((prev) => ({
         ...prev,
         [itemId]: {
@@ -63,6 +48,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       }));
     }
   };
+  
   
   const handleTagFilter = (tag) => {
     setSelectedTag(tag);

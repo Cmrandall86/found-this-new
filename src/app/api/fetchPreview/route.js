@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { getLinkPreview } from "link-preview-js";
 
 // Helper function for timeout
-const withTimeout = (promise, timeout = 5000) =>
+const withTimeout = (promise, timeout = 7000) =>
   Promise.race([
     promise,
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Request timeout")), timeout)
-    ),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("Request timeout")), timeout)),
   ]);
+
+// Local cache to store API responses
+const cache = new Map();
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -16,46 +17,58 @@ export async function GET(request) {
 
   if (!url) {
     console.warn("API called without a URL");
-    return NextResponse.json(
-      { error: "No URL provided" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "No URL provided" }, { status: 400 });
+  }
+
+  // Check if the response is already cached
+  if (cache.has(url)) {
+    console.log("Serving from cache:", url);
+    return NextResponse.json(cache.get(url));
   }
 
   try {
-    // Fetch link preview data with a timeout
-    const previewData = await withTimeout(getLinkPreview(url), 7000);
+    console.log("Fetching preview for:", url);
 
-    // Filter and prioritize high-quality Amazon product images
+    // Fetch link preview data with a custom User-Agent header
+    const previewData = await withTimeout(
+      getLinkPreview(url, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        },
+      }),
+      7000
+    );
+
+    // Filter and prioritize high-quality images
     const productImages = (previewData.images || [])
-      .filter((img) => img.includes("_AC_") || img.includes("_SX")) // Ensure only Amazon-style product images
+      .filter((img) => img.includes("_AC_") || img.includes("_SX"))
       .map((img) =>
-        img
-          .replace(/(_AC_.*?_)/, "_AC_SL500_") // Replace Amazon's size/quality pattern
-          .replace(/(_SX\d+_)/, "_SL500_") // Replace `_SX` patterns with `_SL500_`
+        img.replace(/(_AC_.*?_)/, "_AC_SL250_").replace(/(_SX\d+_)/, "_SX250_")
       )
-      .slice(0, 4); // Limit to 4 images
+      .slice(0, 4);
 
-    return NextResponse.json({
+    const responseData = {
       title: previewData.title || "No title available",
       description: previewData.description || "No description available",
-      images:
-        productImages.length > 0
-          ? productImages
-          : ["https://via.placeholder.com/300x200?text=No+Image"], // Fallback image
-    });
+      images: productImages.length > 0 ? productImages : ["https://via.placeholder.com/300x200?text=No+Image"],
+    };
+
+    // Cache the response for future requests
+    cache.set(url, responseData);
+
+    return NextResponse.json(responseData);
   } catch (error) {
-    console.error("Error fetching preview data:", error.message);
-    const status = error.message === "Request timeout" ? 408 : 500;
+    console.error(`Error fetching preview for URL ${url}:`, error.message);
 
     return NextResponse.json(
       {
         error: "Failed to fetch preview",
-        title: "No Preview Available",
-        description: "Unable to fetch preview data.",
-        images: ["https://via.placeholder.com/300x200?text=No+Image"], // Fallback image
+        url,
+        reason: error.message,
+        images: ["https://via.placeholder.com/300x200?text=No+Image"],
       },
-      { status }
+      { status: error.message === "Request timeout" ? 408 : 500 }
     );
   }
 }
