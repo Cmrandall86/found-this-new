@@ -10,14 +10,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [selectedTag, setSelectedTag] = useState(""); // State for selected tag
   const [filteredItems, setFilteredItems] = useState(items);
   const fetchedURLs = useRef(new Set());
-  const isMounted = useRef(true); // Track whether the component is mounted
-
-  useEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
+  const isInitialRender = useRef(true); // Track initial render
 
   // Fetch preview data
   const fetchPreviewData = async (url, itemId) => {
@@ -25,11 +18,8 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       console.warn("No URL provided for preview fetch");
       return;
     }
-  
+
     try {
-      // Debounce by adding delay
-      await new Promise((resolve) => setTimeout(resolve, 100));
-  
       const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch preview for URL: ${url}, Status: ${response.status}`);
@@ -48,8 +38,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       }));
     }
   };
-  
-  
+
   const handleTagFilter = (tag) => {
     setSelectedTag(tag);
     if (tag) {
@@ -60,6 +49,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     }
   };
 
+  // Fetch previews only for unfetched URLs
   useEffect(() => {
     items.forEach((item) => {
       if (item.productURL && !fetchedURLs.current.has(item.productURL)) {
@@ -67,8 +57,14 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
         fetchedURLs.current.add(item.productURL);
       }
     });
-    setFilteredItems(items);
-  }, [items]);
+
+    // Apply tag filter if a tag is already selected
+    if (selectedTag) {
+      handleTagFilter(selectedTag);
+    } else {
+      setFilteredItems(items);
+    }
+  }, [items, selectedTag]);
 
   const uniqueTags = [...new Set(items.flatMap((item) => item.tags || []))].filter(
     (tag) => tag.trim() !== ""
@@ -87,8 +83,12 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const { rows, prepareRow, setGlobalFilter: setTableGlobalFilter, toggleSortBy } =
     useTable({ columns, data: filteredItems, globalFilter }, useGlobalFilter, useSortBy);
 
+  // Set default sorting to "dateNewest" only on initial render
   useEffect(() => {
-    toggleSortBy("createdAt", true);
+    if (isInitialRender.current) {
+      toggleSortBy("createdAt", true);
+      isInitialRender.current = false;
+    }
   }, [toggleSortBy]);
 
   const handleSearch = (e) => {
