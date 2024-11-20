@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../../styles/globals.css';
 import '../../styles/uploadform.css';
 
-export default function UploadForm({ onSubmit, editPost }) {
+export default function UploadForm({ onSubmit, editPost, onClose }) { // Add onClose prop
   const [formValues, setFormValues] = useState({
     title: '',
     description: '',
@@ -34,15 +34,19 @@ export default function UploadForm({ onSubmit, editPost }) {
       .split(',')
       .map((tag) => tag.trim())
       .filter((tag) => tag !== ''); // Remove empty strings
-  
+
+    // Call onClose immediately to close the form
+    if (onClose) onClose();
+
+    // Submit the form data
     onSubmit({
       ...formValues,
       tags: filteredTags, // Use filtered tags
     });
-  
+
     // Reset form
     setFormValues({ title: '', description: '', productURL: '', price: '', tags: '' });
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="post-form">

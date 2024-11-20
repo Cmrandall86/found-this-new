@@ -43,7 +43,9 @@ export default function HomePage() {
 
         if (response.ok) {
           const updatedPost = await response.json();
-          setPosts((prevPosts) => prevPosts.map((post) => (post._id === updatedPost._id ? updatedPost : post)));
+          setPosts((prevPosts) =>
+            prevPosts.map((post) => (post._id === updatedPost._id ? updatedPost : post))
+          );
         } else {
           console.error("Failed to update post:", response.statusText);
         }
@@ -65,7 +67,6 @@ export default function HomePage() {
           console.error("Failed to create post:", response.statusText);
         }
       }
-      handleToggleForm(); // Hide form after submission
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -100,7 +101,11 @@ export default function HomePage() {
               <button onClick={handleToggleForm} className="close-form">
                 X
               </button>
-              <UploadForm onSubmit={handleFormSubmit} editPost={editPost} />
+              <UploadForm
+                onSubmit={handleFormSubmit}
+                editPost={editPost}
+                onClose={() => setFormVisible(false)} // Close form immediately after submission
+              />
             </>
           )}
         </div>
