@@ -60,31 +60,6 @@ body.dark-mode .toggle-button:hover {
   color: var(--black);
 }
 
-/* Form Button */
-.submit-button {
-  background-color: var(--secondary-color);
-  color: #ffffff;
-  padding: 10px 20px;
-  font-weight: bold;
-  font-size: 1rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-body.dark-mode .submit-button {
-  background-color: var(--secondary-color);
-}
-
-.submit-button:hover {
-  background-color: var(--secondary-color);
-}
-
-body.dark-mode .submit-button:hover {
-  background-color: var(--dark-submit-hover-bg);
-}
-
 /* Floating Action Button */
 .show-form-button {
   width: 50px;

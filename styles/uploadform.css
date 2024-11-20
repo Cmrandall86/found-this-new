@@ -1,99 +1,127 @@
 /* Form Styling */
 .post-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .close-form {
-    background: none;
-    border: none;
-    color: var(--black);
-    font-size: 1.2rem;
-    margin-left: 95%;
-    font-weight: bold;
-    cursor: pointer;
-    padding: 10px;
-    transition: color 0.3s ease;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
 
-  body.dark-mode .close-form {
-    color: var(--white);
-   }
+.close-form {
+  background: none;
+  border: none;
+  color: var(--black);
+  font-size: 1.2rem;
+  margin-left: 95%;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 10px;
+  transition: color 0.3s ease;
+}
+
+body.dark-mode .close-form {
+  color: var(--white);
+}
 
 
-   body.dark-mode input, body.dark-mode textarea{
-    color: var(--white);
-   }
+body.dark-mode input,
+body.dark-mode textarea {
+  color: var(--white);
+}
 
-  .close-button-container {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-  }
-  
-  .close-form:hover {
-    color: var(--danger-hover-bg);
-  }
+.close-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
 
-  body.dark-mode .close-form:hover  {
+.close-form:hover {
+  color: var(--danger-hover-bg);
+}
 
-   }
-  
-  .form-group {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form-label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #555;
-  }
-  
-  body.dark-mode .form-label {
-    color: #bbb;
-  }
-  
-  .form-input,
+body.dark-mode .close-form:hover {}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+body.dark-mode .form-label {
+  color: #bbb;
+}
+
+.form-input,
+.form-textarea {
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid var(--border-color-light);
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  width: 100%;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-textarea {
+  min-height: 300px;
+  font-family: var(--primary-font);
+}
+
+body.dark-mode .form-input,
+body.dark-mode .form-textarea {
+  background-color: #333;
+  border: 1px solid var(--dark-border);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  background-color: #fff;
+}
+
+body.dark-mode .form-input:focus,
+body.dark-mode .form-textarea:focus {
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 5px rgba(29, 185, 84, 0.5);
+  background-color: #2a2a2a;
+}
+
+/* Form Button */
+.submit-button {
+  background-color: var(--secondary-color);
+  color: #ffffff;
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+body.dark-mode .submit-button {
+  background-color: var(--secondary-color);
+}
+
+.submit-button:hover {
+  background-color: var(--secondary-color);
+}
+
+body.dark-mode .submit-button:hover {
+  background-color: var(--dark-submit-hover-bg);
+}
+
+
+@media (max-width: 790px) {
   .form-textarea {
-    padding: 12px;
-    font-size: 1rem;
-    border: 1px solid var(--border-color-light);
-    border-radius: 4px;
-    background-color: #f9f9f9;
-    width: 100%;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .form-textarea {
-    min-height: 300px;
-    font-family: var(--primary-font);
-  }
-  
-  body.dark-mode .form-input,
-  body.dark-mode .form-textarea {
-    background-color: #333;
-    border: 1px solid var(--dark-border);
-  }
-  
-  .form-input:focus,
-  .form-textarea:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-    background-color: #fff;
-  }
-  
-  body.dark-mode .form-input:focus,
-  body.dark-mode .form-textarea:focus {
-    border-color: var(--secondary-color);
-    box-shadow: 0 0 5px rgba(29, 185, 84, 0.5);
-    background-color: #2a2a2a;
+    min-height: 200px;
   }
 
-
-  @media (max-width: 790px) {
-    .form-textarea {
-        min-height: 200px;
-      }
+  .post-form {
+    padding-bottom: 80px;
+  }
 }
