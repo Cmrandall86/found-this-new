@@ -23,15 +23,20 @@ export async function GET(request) {
   }
 
   try {
-    // Add timeout to the preview fetch request
+    // Fetch link preview data with a timeout
     const previewData = await withTimeout(getLinkPreview(url), 5000);
 
-    const productImages = previewData.images
-      .filter((img) => img.includes("_AC_") || img.includes("_SX"))
+    // Filter and prioritize high-quality Amazon product images
+    const productImages = (previewData.images || [])
+      .filter((img) => img.includes("_AC_") || img.includes("_SX")) // Ensure only Amazon-style product images
       .map((img) =>
-        img.replace(/(_AC_.*?_)/, "_AC_SL500_").replace(/(_SX\\d+_)/, "_SL500_")
+        img
+          .replace(/(_AC_.*?_)/, "_AC_SL500_") // Replace Amazon's size/quality pattern
+          .replace(/(_SX\d+_)/, "_SL500_") // Replace `_SX` patterns with `_SL500_`
       )
-      .slice(0, 4);
+      .slice(0, 4); // Limit to 4 images
+
+    console.log("Processed Images:", productImages);
 
     return NextResponse.json({
       title: previewData.title || "No title available",
@@ -39,7 +44,7 @@ export async function GET(request) {
       images:
         productImages.length > 0
           ? productImages
-          : ["https://via.placeholder.com/300x200?text=No+Image"],
+          : ["https://via.placeholder.com/300x200?text=No+Image"], // Fallback image
     });
   } catch (error) {
     console.error("Error fetching preview data:", error.message);
@@ -50,7 +55,7 @@ export async function GET(request) {
         error: "Failed to fetch preview",
         title: "No Preview Available",
         description: "Unable to fetch preview data.",
-        images: ["https://via.placeholder.com/300x200?text=No+Image"],
+        images: ["https://via.placeholder.com/300x200?text=No+Image"], // Fallback image
       },
       { status }
     );

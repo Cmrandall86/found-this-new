@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MiniMenu from "@/components/MiniMenu";
 import "../../styles/productcard.css";
 
@@ -15,18 +15,23 @@ export default function ProductCard({
   tags,
 }) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [imageSrc, setImageSrc] = useState("https://via.placeholder.com/300x200?text=No+Image");
+
+  // Update imageSrc whenever previewData changes
+  useEffect(() => {
+    if (previewData?.images?.[0]) {
+      setImageSrc(previewData.images[0]);
+    }
+  }, [previewData]);
 
   const handleImageLoad = () => {
     setIsImageLoaded(true);
   };
 
-  const handleImageError = (e) => {
-    e.target.src = "https://via.placeholder.com/300x200?text=No+Image";
-    setIsImageLoaded(true); // Mark as loaded to hide the loading animation
+  const handleImageError = () => {
+    setImageSrc("https://via.placeholder.com/300x200?text=No+Image");
+    setIsImageLoaded(true); // Ensure the loading placeholder is removed
   };
-
-  const imageSrc =
-    previewData?.images?.[0] || "https://via.placeholder.com/300x200?text=No+Image";
 
   return (
     <div className="product-card">
@@ -35,19 +40,15 @@ export default function ProductCard({
           ⋮
         </button>
         {isMenuOpen && (
-          <MiniMenu
-            onClose={toggleMenu}
-            onDelete={onDelete}
-            onEdit={onEdit}
-            ref={menuRef}
-          />
+          <MiniMenu onClose={toggleMenu} onDelete={onDelete} onEdit={onEdit} ref={menuRef} />
         )}
       </div>
       <div className="image-container">
+        {/* Show placeholder while loading */}
         {!isImageLoaded && <div className="image-placeholder">Loading...</div>}
         <img
           src={imageSrc}
-          alt={previewData?.description || "No preview available"}
+          alt={previewData?.description || "Product image"}
           className={`preview-thumbnail ${isImageLoaded ? "loaded" : ""}`}
           onLoad={handleImageLoad}
           onError={handleImageError}
@@ -68,12 +69,7 @@ export default function ProductCard({
         </div>
       )}
       {productURL && (
-        <a
-          href={productURL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="product-card-link"
-        >
+        <a href={productURL} target="_blank" rel="noopener noreferrer" className="product-card-link">
           View Product
         </a>
       )}
