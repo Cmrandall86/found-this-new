@@ -9,8 +9,8 @@
     background: none;
     border: none;
     color: var(--black);
-
     font-size: 1.2rem;
+    margin-left: 95%;
     font-weight: bold;
     cursor: pointer;
     padding: 10px;
