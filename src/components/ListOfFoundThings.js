@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useTable, useSortBy, useGlobalFilter } from "react-table";
+import { useTable, useSortBy } from "react-table";
 import ProductCard from "@/components/ProductCard";
 import "../../styles/ListOfFoundThings.css";
 
 export default function ListOfFoundThings({ items, onDelete, onEdit }) {
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [previews, setPreviews] = useState({});
   const [showMenu, setShowMenu] = useState({});
-  const [selectedTag, setSelectedTag] = useState(""); // State for selected tag
+  const [selectedTag, setSelectedTag] = useState("");
   const [filteredItems, setFilteredItems] = useState(items);
   const fetchedURLs = useRef(new Set());
-  const isInitialRender = useRef(true); // Track initial render
+  const isInitialRender = useRef(true);
 
   // Fetch preview data
   const fetchPreviewData = async (url, itemId) => {
@@ -41,15 +41,17 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
 
   const handleTagFilter = (tag) => {
     setSelectedTag(tag);
-    if (tag) {
-      const filtered = items.filter((item) => item.tags?.includes(tag));
-      setFilteredItems(filtered);
-    } else {
-      setFilteredItems(items);
-    }
+    const filtered = items.filter((item) => {
+      const matchesTag = tag ? item.tags?.includes(tag) : true;
+      const matchesSearch =
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.price.toString().includes(searchQuery);
+      return matchesTag && matchesSearch;
+    });
+    setFilteredItems(filtered);
   };
 
-  // Fetch previews only for unfetched URLs
+  // Fetch previews and apply filters
   useEffect(() => {
     items.forEach((item) => {
       if (item.productURL && !fetchedURLs.current.has(item.productURL)) {
@@ -58,13 +60,8 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       }
     });
 
-    // Apply tag filter if a tag is already selected
-    if (selectedTag) {
-      handleTagFilter(selectedTag);
-    } else {
-      setFilteredItems(items);
-    }
-  }, [items, selectedTag]);
+    handleTagFilter(selectedTag);
+  }, [items, selectedTag, searchQuery]);
 
   const uniqueTags = [...new Set(items.flatMap((item) => item.tags || []))].filter(
     (tag) => tag.trim() !== ""
@@ -80,8 +77,10 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     []
   );
 
-  const { rows, prepareRow, setGlobalFilter: setTableGlobalFilter, toggleSortBy } =
-    useTable({ columns, data: filteredItems, globalFilter }, useGlobalFilter, useSortBy);
+  const { rows, prepareRow, toggleSortBy } = useTable(
+    { columns, data: filteredItems },
+    useSortBy
+  );
 
   // Set default sorting to "dateNewest" only on initial render
   useEffect(() => {
@@ -92,8 +91,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   }, [toggleSortBy]);
 
   const handleSearch = (e) => {
-    setGlobalFilter(e.target.value);
-    setTableGlobalFilter(e.target.value);
+    setSearchQuery(e.target.value);
   };
 
   const handleSortChange = (e) => {
@@ -116,8 +114,8 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       <div className="filter-controls">
         <input
           type="text"
-          placeholder="Search by title..."
-          value={globalFilter}
+          placeholder="Search by title or price..."
+          value={searchQuery}
           onChange={handleSearch}
           className="filter-input"
         />
