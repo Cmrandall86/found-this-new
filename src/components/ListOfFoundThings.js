@@ -44,8 +44,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     const filtered = items.filter((item) => {
       const matchesTag = tag ? item.tags?.includes(tag) : true;
       const matchesSearch =
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.price.toString().includes(searchQuery);
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) || item.price.toString().includes(searchQuery);
       return matchesTag && matchesSearch;
     });
     setFilteredItems(filtered);
@@ -63,9 +62,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     handleTagFilter(selectedTag);
   }, [items, selectedTag, searchQuery]);
 
-  const uniqueTags = [...new Set(items.flatMap((item) => item.tags || []))].filter(
-    (tag) => tag.trim() !== ""
-  );
+  const uniqueTags = [...new Set(items.flatMap((item) => item.tags || []))].filter((tag) => tag.trim() !== "");
 
   const columns = React.useMemo(
     () => [
@@ -77,10 +74,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     []
   );
 
-  const { rows, prepareRow, toggleSortBy } = useTable(
-    { columns, data: filteredItems },
-    useSortBy
-  );
+  const { rows, prepareRow, toggleSortBy } = useTable({ columns, data: filteredItems }, useSortBy);
 
   // Set default sorting to "dateNewest" only on initial render
   useEffect(() => {
@@ -126,11 +120,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
           <option value="dateNewest">Newest First</option>
           <option value="dateOldest">Oldest First</option>
         </select>
-        <select
-          onChange={(e) => handleTagFilter(e.target.value)}
-          value={selectedTag}
-          className="tag-filter-select"
-        >
+        <select onChange={(e) => handleTagFilter(e.target.value)} value={selectedTag} className="tag-filter-select">
           <option value="">All Tags</option>
           {uniqueTags.map((tag) => (
             <option key={tag} value={tag}>
