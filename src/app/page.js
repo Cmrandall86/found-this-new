@@ -22,6 +22,7 @@ export default function HomePage() {
     fetchPosts();
   }, []);
 
+
   const handleToggleForm = () => {
     setFormVisible((prev) => !prev);
     if (isFormVisible) setEditPost(null); // Reset editPost if closing form

@@ -12,7 +12,8 @@ export async function GET() {
       price,
       tags, // Include tags in the response
       createdAt,
-      updatedAt
+      updatedAt,
+      imageUrl
     }`;
 
     const posts = await client.fetch(query);

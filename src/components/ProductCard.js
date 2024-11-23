@@ -6,58 +6,24 @@ export default function ProductCard({
   title,
   productURL,
   price,
-  previewData,
   isMenuOpen,
   toggleMenu,
   onDelete,
   onEdit,
   menuRef,
   tags,
+  imageUrl,
 }) {
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [imageSrc, setImageSrc] = useState("");
-
-  // Update imageSrc whenever previewData changes
-  useEffect(() => {
-    if (previewData?.images?.[0]) {
-      setImageSrc(previewData.images[0]); // Use the provided image
-    } else {
-      setImageSrc(""); // Leave blank to trigger loading animation
-    }
-  }, [previewData]);
-
-  const handleImageLoad = () => {
-    setIsImageLoaded(true); // Mark as loaded to remove loading animation
-  };
-
-  const handleImageError = () => {
-    setImageSrc("https://via.placeholder.com/300x200?text=No+Image"); // Fallback to placeholder
-    setIsImageLoaded(true); // Stop loading animation
-  };
-
   return (
     <div className="product-card">
       <div className="menu-button-container">
         <button className="menu-button" onClick={toggleMenu}>
           ⋮
         </button>
-        {isMenuOpen && (
-          <MiniMenu onClose={toggleMenu} onDelete={onDelete} onEdit={onEdit} ref={menuRef} />
-        )}
+        {isMenuOpen && <MiniMenu onClose={toggleMenu} onDelete={onDelete} onEdit={onEdit} ref={menuRef} />}
       </div>
       <div className="image-container">
-        {/* Show loading animation until image loads or falls back to placeholder */}
-        {!isImageLoaded && <div className="image-placeholder">Loading...</div>}
-        {imageSrc && (
-          <img
-            src={imageSrc}
-            alt={previewData?.description || "Product image"}
-            className={`preview-thumbnail ${isImageLoaded ? "loaded" : ""}`}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-            loading="lazy"
-          />
-        )}
+        <img src={imageUrl} alt={"Product image"} className={`preview-thumbnail loaded`} loading="lazy" />
       </div>
       <h3 className="product-card-title">{title}</h3>
       <p className="product-card-price">{price ? `$${price}` : "N/A"}</p>
