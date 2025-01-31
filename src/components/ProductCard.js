@@ -16,20 +16,17 @@ export default function ProductCard({
   tags,
   mainImage,
 }) {
-  const [imageState, setImageState] = useState("loading"); // "loading", "loaded", "no-image", "error"
+  const [imageState, setImageState] = useState("loading"); // "loading", "loaded", "no-image"
   const [imageSrc, setImageSrc] = useState("");
 
   useEffect(() => {
-    // Reset state when props change
     setImageState("loading");
 
-    // Check if we have an image source
     if (mainImage) {
       setImageSrc(mainImage);
     } else if (previewData?.images?.[0]) {
       setImageSrc(previewData.images[0]);
     } else {
-      // No image available
       setImageState("no-image");
     }
   }, [mainImage, previewData]);
@@ -39,7 +36,7 @@ export default function ProductCard({
   };
 
   const handleImageError = () => {
-    setImageState("error");
+    setImageState("no-image");
   };
 
   const renderImageContent = () => {
@@ -57,14 +54,6 @@ export default function ProductCard({
           <div className="placeholder-container">
             <FaImage className="placeholder-icon" />
             <span>No Image Available</span>
-          </div>
-        );
-      
-      case "error":
-        return (
-          <div className="placeholder-container error">
-            <FaImage className="placeholder-icon" />
-            <span>Failed to load image</span>
           </div>
         );
       
