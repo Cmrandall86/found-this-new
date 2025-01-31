@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import MiniMenu from "@/components/MiniMenu";
 import "../../styles/productcard.css";
+import { FaImage } from 'react-icons/fa';
 
 export default function ProductCard({
   title,
@@ -13,26 +14,67 @@ export default function ProductCard({
   onEdit,
   menuRef,
   tags,
+  mainImage,
 }) {
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [imageState, setImageState] = useState("loading"); // "loading", "loaded", "no-image", "error"
   const [imageSrc, setImageSrc] = useState("");
 
-  // Update imageSrc whenever previewData changes
   useEffect(() => {
-    if (previewData?.images?.[0]) {
-      setImageSrc(previewData.images[0]); // Use the provided image
+    // Reset state when props change
+    setImageState("loading");
+
+    // Check if we have an image source
+    if (mainImage) {
+      setImageSrc(mainImage);
+    } else if (previewData?.images?.[0]) {
+      setImageSrc(previewData.images[0]);
     } else {
-      setImageSrc(""); // Leave blank to trigger loading animation
+      // No image available
+      setImageState("no-image");
     }
-  }, [previewData]);
+  }, [mainImage, previewData]);
 
   const handleImageLoad = () => {
-    setIsImageLoaded(true); // Mark as loaded to remove loading animation
+    setImageState("loaded");
   };
 
   const handleImageError = () => {
-    setImageSrc("https://via.placeholder.com/300x200?text=No+Image"); // Fallback to placeholder
-    setIsImageLoaded(true); // Stop loading animation
+    setImageState("no-image");
+  };
+
+  const renderImageContent = () => {
+    switch (imageState) {
+      case "loading":
+        return (
+          <div className="loading-animation">
+            <div className="loading-spinner"></div>
+            <span>Loading image...</span>
+          </div>
+        );
+      
+      case "no-image":
+      case "error":
+        return (
+          <div className="placeholder-container">
+            <FaImage className="placeholder-icon" />
+            <span>No Image Available</span>
+          </div>
+        );
+      
+      case "loaded":
+        return (
+          <img
+            src={imageSrc}
+            alt={title || "Product image"}
+            className="preview-thumbnail loaded"
+            onError={handleImageError}
+            loading="lazy"
+          />
+        );
+      
+      default:
+        return null;
+    }
   };
 
   return (
@@ -46,18 +88,17 @@ export default function ProductCard({
         )}
       </div>
       <div className="image-container">
-        {/* Show loading animation until image loads or falls back to placeholder */}
-        {!isImageLoaded && <div className="image-placeholder">Loading...</div>}
-        {imageSrc && (
+        {imageSrc && imageState === "loading" && (
           <img
             src={imageSrc}
-            alt={previewData?.description || "Product image"}
-            className={`preview-thumbnail ${isImageLoaded ? "loaded" : ""}`}
+            alt={title || "Product image"}
+            className="preview-thumbnail"
             onLoad={handleImageLoad}
             onError={handleImageError}
-            loading="lazy"
+            style={{ display: 'none' }}
           />
         )}
+        {renderImageContent()}
       </div>
       <h3 className="product-card-title">{title}</h3>
       <p className="product-card-price">{price ? `$${price}` : "N/A"}</p>

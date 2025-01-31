@@ -154,6 +154,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               onDelete={() => onDelete(row.original._id)}
               onEdit={() => onEdit(row.original)}
               tags={tags}
+              mainImage={row.original.mainImage}
             />
           );
         })}
