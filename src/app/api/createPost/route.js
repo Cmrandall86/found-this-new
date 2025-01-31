@@ -1,6 +1,7 @@
 // src/app/api/createPost/route.js
 import client from '../../../../lib/sanityClient'; 
 import { NextResponse } from 'next/server';
+import { fetchPreviewUrls } from './fetchPreviewUrls';
 
 export async function POST(request) {
   try {

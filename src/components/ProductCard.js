@@ -7,7 +7,6 @@ export default function ProductCard({
   title,
   productURL,
   price,
-  previewData,
   isMenuOpen,
   toggleMenu,
   onDelete,
@@ -26,13 +25,11 @@ export default function ProductCard({
     // Check if we have an image source
     if (mainImage) {
       setImageSrc(mainImage);
-    } else if (previewData?.images?.[0]) {
-      setImageSrc(previewData.images[0]);
     } else {
       // No image available
       setImageState("no-image");
     }
-  }, [mainImage, previewData]);
+  }, [mainImage]);
 
   const handleImageLoad = () => {
     setImageState("loaded");
@@ -83,9 +80,7 @@ export default function ProductCard({
         <button className="menu-button" onClick={toggleMenu}>
           ⋮
         </button>
-        {isMenuOpen && (
-          <MiniMenu onClose={toggleMenu} onDelete={onDelete} onEdit={onEdit} ref={menuRef} />
-        )}
+        {isMenuOpen && <MiniMenu onClose={toggleMenu} onDelete={onDelete} onEdit={onEdit} ref={menuRef} />}
       </div>
       <div className="image-container">
         {imageSrc && imageState === "loading" && (
