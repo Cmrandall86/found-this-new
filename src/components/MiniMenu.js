@@ -22,7 +22,7 @@ export default function MiniMenu({ onDelete, onEdit, onClose }) {
   return (
     <div className="mini-menu" ref={menuRef}>
       <button onClick={onClose} className="close-button">
-        X
+        ×
       </button>
       <button
         className="menu-action delete-action"

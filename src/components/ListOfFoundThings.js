@@ -113,19 +113,25 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
           onChange={handleSearch}
           className="filter-input"
         />
-        <select onChange={handleSortChange} className="sort-select" defaultValue="dateNewest">
+        <select 
+          onChange={handleSortChange} 
+          className="sort-select" 
+          defaultValue="dateNewest"
+        >
           <option value="title">Sort (A-Z)</option>
           <option value="priceLow">Price Low to High</option>
           <option value="priceHigh">Price High to Low</option>
           <option value="dateNewest">Newest First</option>
           <option value="dateOldest">Oldest First</option>
         </select>
-        <select onChange={(e) => handleTagFilter(e.target.value)} value={selectedTag} className="tag-filter-select">
+        <select 
+          onChange={(e) => handleTagFilter(e.target.value)} 
+          value={selectedTag} 
+          className="tag-filter-select"
+        >
           <option value="">All Tags</option>
           {uniqueTags.map((tag) => (
-            <option key={tag} value={tag}>
-              {tag}
-            </option>
+            <option key={tag} value={tag}>{tag}</option>
           ))}
         </select>
       </div>
