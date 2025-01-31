@@ -1,39 +1,88 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTable, useSortBy } from "react-table";
 import ProductCard from "@/components/ProductCard";
 import "../../styles/ListOfFoundThings.css";
 
-const columns = [
-  { Header: "Title", accessor: "title" },
-  { Header: "Product URL", accessor: "productURL" },
-  { Header: "Price", accessor: "price" },
-  { Header: "Date Uploaded", accessor: "createdAt" },
-];
-
 export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [previews, setPreviews] = useState({});
   const [showMenu, setShowMenu] = useState({});
   const [selectedTag, setSelectedTag] = useState("");
+  const [filteredItems, setFilteredItems] = useState(items);
+  const fetchedURLs = useRef(new Set());
+  const isInitialRender = useRef(true);
 
-  const filteredItems = useMemo(() => {
-    return selectedTag
-      ? items.filter((item) => {
-          const matchesTag = selectedTag ? item.tags?.includes(selectedTag) : true;
-          const matchesSearch =
-            item.title.toLowerCase().includes(searchQuery.toLowerCase()) || item.price.toString().includes(searchQuery);
-          return matchesTag && matchesSearch;
-        })
-      : items;
-  }, [selectedTag, items]);
+  // Fetch preview data
+  const fetchPreviewData = async (url, itemId) => {
+    if (!url) {
+      console.warn("No URL provided for preview fetch");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch preview for URL: ${url}, Status: ${response.status}`);
+      }
+      const data = await response.json();
+      setPreviews((prev) => ({ ...prev, [itemId]: data }));
+    } catch (error) {
+      console.error(`Error fetching preview for URL ${url}:`, error.message);
+      setPreviews((prev) => ({
+        ...prev,
+        [itemId]: {
+          title: "No Preview Available",
+          description: "Unable to fetch preview data.",
+          images: ["https://via.placeholder.com/300x200?text=No+Image"],
+        },
+      }));
+    }
+  };
 
   const handleTagFilter = (tag) => {
     setSelectedTag(tag);
+    const filtered = items.filter((item) => {
+      const matchesTag = tag ? item.tags?.includes(tag) : true;
+      const matchesSearch =
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) || item.price.toString().includes(searchQuery);
+      return matchesTag && matchesSearch;
+    });
+    setFilteredItems(filtered);
   };
 
+  // Fetch previews and apply filters
+  useEffect(() => {
+    items.forEach((item) => {
+      if (item.productURL && !fetchedURLs.current.has(item.productURL)) {
+        fetchPreviewData(item.productURL, item._id);
+        fetchedURLs.current.add(item.productURL);
+      }
+    });
+
+    handleTagFilter(selectedTag);
+  }, [items, selectedTag, searchQuery]);
+
   const uniqueTags = [...new Set(items.flatMap((item) => item.tags || []))].filter((tag) => tag.trim() !== "");
-  //inside useTable there will be a place to default the sort
+
+  const columns = React.useMemo(
+    () => [
+      { Header: "Title", accessor: "title" },
+      { Header: "Product URL", accessor: "productURL" },
+      { Header: "Price", accessor: "price" },
+      { Header: "Date Uploaded", accessor: "createdAt" },
+    ],
+    []
+  );
+
   const { rows, prepareRow, toggleSortBy } = useTable({ columns, data: filteredItems }, useSortBy);
 
+  // Set default sorting to "dateNewest" only on initial render
+  useEffect(() => {
+    if (isInitialRender.current) {
+      toggleSortBy("createdAt", true);
+      isInitialRender.current = false;
+    }
+  }, [toggleSortBy]);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
@@ -65,7 +114,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
           className="filter-input"
         />
         <select onChange={handleSortChange} className="sort-select" defaultValue="dateNewest">
-          <option value="title">Sort (A to Z)</option>
+          <option value="title">Sort (A-Z)</option>
           <option value="priceLow">Price Low to High</option>
           <option value="priceHigh">Price High to Low</option>
           <option value="dateNewest">Newest First</option>
@@ -84,7 +133,8 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       <div className="grid-container">
         {rows.map((row) => {
           prepareRow(row);
-          const { title, productURL, price, tags, imageUrl } = row.original;
+          const { title, productURL, price, tags } = row.original;
+          const previewData = previews[row.original._id];
           const isMenuOpen = showMenu[row.original._id];
           const toggleMenu = () =>
             setShowMenu((prev) => ({
@@ -98,7 +148,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               title={title}
               productURL={productURL}
               price={price}
-              imageUrl={imageUrl}
+              previewData={previewData}
               isMenuOpen={isMenuOpen}
               toggleMenu={toggleMenu}
               onDelete={() => onDelete(row.original._id)}

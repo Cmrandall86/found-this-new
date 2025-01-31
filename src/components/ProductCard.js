@@ -7,6 +7,7 @@ export default function ProductCard({
   title,
   productURL,
   price,
+  previewData,
   isMenuOpen,
   toggleMenu,
   onDelete,
@@ -25,18 +26,20 @@ export default function ProductCard({
     // Check if we have an image source
     if (mainImage) {
       setImageSrc(mainImage);
+    } else if (previewData?.images?.[0]) {
+      setImageSrc(previewData.images[0]);
     } else {
       // No image available
       setImageState("no-image");
     }
-  }, [mainImage]);
+  }, [mainImage, previewData]);
 
   const handleImageLoad = () => {
     setImageState("loaded");
   };
 
   const handleImageError = () => {
-    setImageState("no-image");
+    setImageState("error");
   };
 
   const renderImageContent = () => {
@@ -50,11 +53,18 @@ export default function ProductCard({
         );
       
       case "no-image":
-      case "error":
         return (
           <div className="placeholder-container">
             <FaImage className="placeholder-icon" />
             <span>No Image Available</span>
+          </div>
+        );
+      
+      case "error":
+        return (
+          <div className="placeholder-container error">
+            <FaImage className="placeholder-icon" />
+            <span>Failed to load image</span>
           </div>
         );
       
@@ -80,7 +90,9 @@ export default function ProductCard({
         <button className="menu-button" onClick={toggleMenu}>
           ⋮
         </button>
-        {isMenuOpen && <MiniMenu onClose={toggleMenu} onDelete={onDelete} onEdit={onEdit} ref={menuRef} />}
+        {isMenuOpen && (
+          <MiniMenu onClose={toggleMenu} onDelete={onDelete} onEdit={onEdit} ref={menuRef} />
+        )}
       </div>
       <div className="image-container">
         {imageSrc && imageState === "loading" && (
