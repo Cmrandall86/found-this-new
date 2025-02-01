@@ -115,8 +115,8 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   };
 
   // Function to get optimized image URL
-  const getOptimizedImageUrl = (mainImage, width = 1200) => {
-    if (!mainImage || !mainImage.asset) {
+  const getOptimizedImageUrl = (mainImage) => {
+    if (!mainImage || !mainImage.asset || !mainImage.asset._ref) {
       return "https://via.placeholder.com/300x200?text=No+Image";
     }
     
@@ -128,10 +128,9 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
         .quality(95)
         .fit('clip')
         .auto('format')
-        .sharpen(10)
         .url();
     } catch (error) {
-      console.error('Error generating image URL:', error);
+      console.error('Error generating image URL:', error, mainImage);
       return "https://via.placeholder.com/300x200?text=No+Image";
     }
   };
@@ -198,9 +197,6 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               [row.original._id]: !prev[row.original._id],
             }));
 
-          // Use preview images if no mainImage from Sanity
-          const imageToUse = mainImage ? getOptimizedImageUrl(mainImage) : null;
-
           return (
             <ProductCard
               key={row.id}
@@ -214,7 +210,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               onDelete={() => onDelete(row.original._id)}
               onEdit={() => onEdit(row.original)}
               tags={tags}
-              mainImage={imageToUse}
+              mainImage={mainImage ? getOptimizedImageUrl(mainImage) : null}
             />
           );
         })}

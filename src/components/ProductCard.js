@@ -20,31 +20,46 @@ export default function ProductCard({
   const [imageState, setImageState] = useState("loading"); // "loading", "loaded", "no-image"
   const [imageSrc, setImageSrc] = useState("");
   const [showDescription, setShowDescription] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [imageUrl, setImageUrl] = useState(mainImage);
 
   useEffect(() => {
     setImageState("loading");
     
     // First try to use the Sanity image
     if (mainImage) {
-      setImageSrc(mainImage);
+      setImageUrl(mainImage);
+      setImageError(false);
     }
     // If no Sanity image, try to use preview image
     else if (previewData?.images?.[0]) {
-      setImageSrc(previewData.images[0]);
+      setImageUrl(previewData.images[0]);
+      setImageError(false);
     }
     // If neither exists, show placeholder
     else {
       setImageState("no-image");
-      setImageSrc("");
+      setImageUrl("https://via.placeholder.com/300x200?text=No+Image");
+      setImageError(true);
     }
   }, [mainImage, previewData]);
+
+  useEffect(() => {
+    console.log('Product Card Image:', {
+      title,
+      mainImage,
+      previewData
+    });
+  }, [title, mainImage, previewData]);
 
   const handleImageLoad = () => {
     setImageState("loaded");
   };
 
   const handleImageError = () => {
-    setImageState("no-image");
+    console.error(`Image failed to load for ${title}:`, imageUrl);
+    setImageError(true);
+    setImageUrl(previewData?.images?.[0] || "https://via.placeholder.com/300x200?text=No+Image");
   };
 
   const toggleDescription = (e) => {
@@ -81,7 +96,7 @@ export default function ProductCard({
         return (
           <div className="image-with-description">
             <img
-              src={imageSrc}
+              src={!imageError ? imageUrl : "https://via.placeholder.com/300x200?text=No+Image"}
               alt={title || "Product image"}
               className="preview-thumbnail loaded"
               onError={handleImageError}
@@ -101,6 +116,8 @@ export default function ProductCard({
         return null;
     }
   };
+
+  const displayImage = mainImage || (previewData?.images?.[0]) || "https://via.placeholder.com/300x200?text=No+Image";
 
   return (
     <div className="product-card">
