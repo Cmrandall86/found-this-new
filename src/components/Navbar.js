@@ -24,7 +24,7 @@ export default function Navbar({ isFormVisible, toggleFormVisibility }) {
 
   return (
     <nav className="navbar">
-      <a href="/" className="navbar-title">
+      <a href="/" className="navbar-title header-font">
         Curated Finds
       </a>
 

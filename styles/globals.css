@@ -12,11 +12,18 @@
   box-sizing: border-box;
 }
 
-/* Body Styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
 body {
   background: linear-gradient(135deg, #f6f7f9 0%, #e9eef2 100%);
-  min-height: 100vh;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 body::before {
@@ -293,5 +300,69 @@ body.dark-mode .left-column {
     padding-right: 0;
     margin-right: 5px;
     top: 32px;
+  }
+}
+
+/* Fix scrolling issues */
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Content layout */
+.homePage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 60px; /* Height of navbar */
+}
+
+.container-flex.content {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1400px;
+  padding: 20px;
+}
+
+.right-column.expanded {
+  flex: 1;
+  padding: 20px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .homePage {
+    padding-top: 50px;
+  }
+  
+  .container-flex.content {
+    padding: 12px;
+  }
+  
+  .navbar-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container-flex.content {
+    padding: 8px;
+  }
+  
+  .navbar-title {
+    font-size: 1.3rem;
   }
 }

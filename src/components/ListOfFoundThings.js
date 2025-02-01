@@ -21,6 +21,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [filteredItems, setFilteredItems] = useState(items);
   const fetchedURLs = useRef(new Set());
   const isInitialRender = useRef(true);
+  const [showFilters, setShowFilters] = useState(true);
 
   // Fetch preview data
   const fetchPreviewData = async (url, itemId) => {
@@ -135,39 +136,56 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     }
   };
 
+  const toggleFilters = () => setShowFilters(!showFilters);
+
   return (
     <div>
-      <div className="filter-controls">
-        <input
-          type="text"
-          placeholder="Search by title or price..."
-          value={searchQuery}
-          onChange={handleSearch}
-          className="filter-input"
-        />
-        <select 
-          onChange={handleSortChange} 
-          className="sort-select" 
-          defaultValue="dateNewest"
-        >
-          <option value="title">Sort (A-Z)</option>
-          <option value="priceLow">Price Low to High</option>
-          <option value="priceHigh">Price High to Low</option>
-          <option value="dateNewest">Newest First</option>
-          <option value="dateOldest">Oldest First</option>
-        </select>
-        <select 
-          onChange={(e) => handleTagFilter(e.target.value)} 
-          value={selectedTag} 
-          className="tag-filter-select"
-        >
-          <option value="">All Tags</option>
-          {uniqueTags.map((tag) => (
-            <option key={tag} value={tag}>{tag}</option>
-          ))}
-        </select>
+      <div className="page-header">
+        <h1 className="page-title header-font">Curated Finds</h1>
+        <p className="page-subtitle">Discover hand-picked products worth sharing</p>
       </div>
-
+      <div className="filters-section">
+        <button 
+          className={`filter-toggle ${showFilters ? 'active' : ''}`}
+          onClick={toggleFilters}
+          aria-label={showFilters ? 'Hide filters' : 'Show filters'}
+        >
+          <span className="filter-toggle-text">Filters</span>
+          <span className="filter-toggle-icon">{showFilters ? '▼' : '▲'}</span>
+        </button>
+        <div className={`filter-controls ${showFilters ? 'show' : ''}`}>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={handleSearch}
+            className="filter-input"
+          />
+          <div className="dropdown-container">
+            <select 
+              onChange={handleSortChange} 
+              className="sort-select" 
+              defaultValue="dateNewest"
+            >
+              <option value="title">A-Z</option>
+              <option value="priceLow">Price ↑</option>
+              <option value="priceHigh">Price ↓</option>
+              <option value="dateNewest">Newest</option>
+              <option value="dateOldest">Oldest</option>
+            </select>
+            <select 
+              onChange={(e) => handleTagFilter(e.target.value)} 
+              value={selectedTag} 
+              className="tag-filter-select"
+            >
+              <option value="">All Tags</option>
+              {uniqueTags.map((tag) => (
+                <option key={tag} value={tag}>{tag}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
       <div className="grid-container">
         {rows.map((row) => {
           prepareRow(row);

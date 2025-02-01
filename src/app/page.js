@@ -112,11 +112,8 @@ export default function HomePage() {
         </div>
 
         <div className={`right-column ${isFormVisible ? "" : "expanded"}`}>
-          <h1 className="main-title">Curated Finds</h1>
           <div className="outer-scroll">
-            <div className="inner-scroll">
-              <ListOfFoundThings items={posts} onDelete={handleDelete} onEdit={handleEdit} />
-            </div>
+            <ListOfFoundThings items={posts} onDelete={handleDelete} onEdit={handleEdit} />
           </div>
         </div>
       </div>
