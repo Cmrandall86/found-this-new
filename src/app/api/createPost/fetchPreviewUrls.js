@@ -24,7 +24,6 @@ export async function fetchPreviewUrls(url) {
       };
     }
 
-    // Check if URL is from Amazon using more robust check
     if (!isAmazonUrl(url)) {
       return {
         title: "Non-Amazon URL",
@@ -37,42 +36,53 @@ export async function fetchPreviewUrls(url) {
       const previewData = await withTimeout(
         getLinkPreview(url, {
           headers: {
-            "User-Agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
           },
         }),
         5000
       );
   
+      // More strict filtering for product images
       const productImages = (previewData.images || [])
-        .filter((img) => img.includes("_AC_") || img.includes("_SX") || img.includes("images/I/"))
+        .filter(img => {
+          // Only accept Amazon product images
+          const isProductImage = 
+            img.includes('/images/I/') && // Main product image path
+            !img.includes('banner') &&    // Exclude banners
+            !img.includes('advertisement') &&
+            !img.includes('promotion') &&
+            !img.includes('deal') &&
+            img.includes('._'); // Amazon image format marker
+
+          return isProductImage;
+        })
         .map((img) => {
-          if (img.includes('_AC_')) {
-            return img.replace(/(_AC_.*?_)/, '_AC_SL2000_')
-                     .replace(/_\d+x\d+_/, '_2000x2000_')
-                     .replace(/\._.*?_\./, '._FMjpg_.');
-          }
-          if (img.includes('_SX')) {
-            return img.replace(/(_SX\d+_)/, '_SX2000_')
-                     .replace(/\._.*?_\./, '._FMjpg_.');
-          }
-          if (img.includes('images/I/')) {
-            const baseUrl = img.split('._')[0];
-            return `${baseUrl}._AC_SL2000_FMjpg_.jpg`;
-          }
-          return img;
+          // Extract the base image ID
+          const baseUrl = img.split('._')[0];
+          // Request high quality version
+          return `${baseUrl}._AC_SL2000_FMjpg_.jpg`;
         })
         .filter((img, index, self) => 
-          self.indexOf(img) === index && 
-          !img.includes('_SL50_') && 
-          !img.includes('_SX50_')
+          // Remove duplicates
+          self.indexOf(img) === index
         )
         .slice(0, 4);
-  
+
+      // If no valid product images found, return placeholder
+      if (productImages.length === 0) {
+        return {
+          title: previewData.title || "No title available",
+          description: previewData.description || "No description available",
+          images: ["https://via.placeholder.com/300x200?text=No+Product+Image"],
+        };
+      }
+
       return {
         title: previewData.title || "No title available",
         description: previewData.description || "No description available",
-        images: productImages.length > 0 ? productImages : ["https://via.placeholder.com/300x200?text=No+Image"],
+        images: productImages,
       };
       
     } catch (error) {
@@ -82,4 +92,4 @@ export async function fetchPreviewUrls(url) {
         images: ["https://via.placeholder.com/300x200?text=Error+Loading+Preview"],
       };
     }
-  }
+}
