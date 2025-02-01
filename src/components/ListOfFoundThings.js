@@ -117,21 +117,20 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   // Function to get optimized image URL
   const getOptimizedImageUrl = (mainImage) => {
     if (!mainImage || !mainImage.asset || !mainImage.asset._ref) {
-      return "https://via.placeholder.com/300x200?text=No+Image";
+      return null;
     }
     
     try {
+      // Add unique identifier for each image
+      const uniqueId = mainImage.asset._ref;
       return urlFor(mainImage)
-        .width(1200)
-        .height(800)
-        .format('webp')
-        .quality(95)
-        .fit('clip')
-        .auto('format')
-        .url();
+        .width(800)
+        .height(600)
+        .quality(90)
+        .url() + `&id=${uniqueId}`;
     } catch (error) {
       console.error('Error generating image URL:', error, mainImage);
-      return "https://via.placeholder.com/300x200?text=No+Image";
+      return null;
     }
   };
 
@@ -199,7 +198,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
 
           return (
             <ProductCard
-              key={row.id}
+              key={`${row.id}-${row.original._id}`}
               title={title}
               description={row.original.description}
               productURL={productURL}
@@ -211,6 +210,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               onEdit={() => onEdit(row.original)}
               tags={tags}
               mainImage={mainImage ? getOptimizedImageUrl(mainImage) : null}
+              postId={row.original._id}
             />
           );
         })}

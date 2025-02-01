@@ -24,13 +24,23 @@ export default function ProductCard({
   // Determine which image to use
   const imageUrl = React.useMemo(() => {
     if (mainImage) {
+      // For Sanity images
       return mainImage;
     }
     if (previewData?.images?.[0]) {
-      return `${previewData.images[0]}?t=${Date.now()}`; // Add cache buster
+      // For preview images
+      const timestamp = Date.now();
+      const previewUrl = previewData.images[0];
+      return `${previewUrl}${previewUrl.includes('?') ? '&' : '?'}t=${timestamp}`;
     }
     return null;
   }, [mainImage, previewData]);
+
+  // Add useEffect to reset loading state when image URL changes
+  useEffect(() => {
+    setIsLoading(true);
+    setHasError(false);
+  }, [imageUrl]);
 
   const handleImageLoad = () => {
     setIsLoading(false);
@@ -81,6 +91,7 @@ export default function ProductCard({
               onError={handleImageError}
               onClick={toggleDescription}
               style={{ display: isLoading ? 'none' : 'block' }}
+              key={imageUrl} // Add key to force re-render when URL changes
             />
             {showDescription && (
               <div className="image-description-overlay">
