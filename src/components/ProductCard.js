@@ -5,6 +5,7 @@ import { FaImage } from 'react-icons/fa';
 
 export default function ProductCard({
   title,
+  description,
   productURL,
   price,
   previewData,
@@ -18,6 +19,7 @@ export default function ProductCard({
 }) {
   const [imageState, setImageState] = useState("loading"); // "loading", "loaded", "no-image"
   const [imageSrc, setImageSrc] = useState("");
+  const [showDescription, setShowDescription] = useState(false);
 
   useEffect(() => {
     setImageState("loading");
@@ -45,6 +47,18 @@ export default function ProductCard({
     setImageState("no-image");
   };
 
+  const toggleDescription = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowDescription(!showDescription);
+  };
+
+  const handleModalClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowDescription(false);
+  };
+
   const renderImageContent = () => {
     switch (imageState) {
       case "loading":
@@ -65,13 +79,22 @@ export default function ProductCard({
       
       case "loaded":
         return (
-          <img
-            src={imageSrc}
-            alt={title || "Product image"}
-            className="preview-thumbnail loaded"
-            onError={handleImageError}
-            loading="lazy"
-          />
+          <div className="image-with-description">
+            <img
+              src={imageSrc}
+              alt={title || "Product image"}
+              className="preview-thumbnail loaded"
+              onError={handleImageError}
+              loading="lazy"
+              onClick={toggleDescription}
+            />
+            {showDescription && (
+              <div className="image-description-overlay">
+                <button className="close-description" onClick={toggleDescription}>×</button>
+                <p>{description || previewData?.description || "No description available"}</p>
+              </div>
+            )}
+          </div>
         );
       
       default:

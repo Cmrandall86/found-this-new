@@ -187,6 +187,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
             <ProductCard
               key={row.id}
               title={title}
+              description={row.original.description}
               productURL={productURL}
               price={price}
               previewData={previewData}

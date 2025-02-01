@@ -131,7 +131,7 @@ body.dark-mode .product-card-link:hover {
   position: absolute;
   top: 8px;
   right: 8px;
-  z-index: 2;
+  z-index: 5;
 }
 
 /* Enhanced Menu Button */
@@ -199,12 +199,16 @@ body.dark-mode .menu-button.active {
 /* Image Container */
 .image-container {
   width: 100%;
-  aspect-ratio: 16/9;
+  height: 200px;
   border-radius: 16px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.03);
   border: 1px solid rgba(0, 0, 0, 0.06);
   margin-bottom: 16px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .image-container:hover {
@@ -246,13 +250,10 @@ body.dark-mode .image-container {
 }
 
 .preview-thumbnail {
-  width: auto;
+  width: 100%;
   height: 100%;
-  max-width: 100%;
   object-fit: contain;
-  transition: opacity 0.3s ease;
-  opacity: 0;
-  border-radius: 8px;
+  transition: transform 0.3s ease;
 }
 
 .preview-thumbnail.loaded {
@@ -260,7 +261,7 @@ body.dark-mode .image-container {
 }
 
 .preview-thumbnail:hover {
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 body.dark-mode .preview-thumbnail {
@@ -306,8 +307,7 @@ body.dark-mode .product-card-tag {
   }
 
   .image-container {
-    margin-bottom: 12px;
-    aspect-ratio: 16/9;
+    height: 180px;
   }
 
   .product-card-title {
@@ -356,7 +356,7 @@ body.dark-mode .product-card-tag {
   }
 
   .image-container {
-    margin-bottom: 10px;
+    height: 160px;
   }
 
   .product-card-title {
@@ -541,4 +541,84 @@ body.dark-mode .placeholder-icon {
   --dark-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
   --dark-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --dark-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.image-with-description {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.image-description-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 12px;
+  z-index: 3;
+}
+
+.close-description {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 4;
+}
+
+.close-description:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.image-description-overlay p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  overflow-y: auto;
+  max-height: 100%;
+  padding: 10px;
+  padding-top: 30px; /* Make room for close button */
+}
+
+/* Dark mode adjustment */
+body.dark-mode .image-description-overlay {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+body.dark-mode .close-description {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-mode .close-description:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Remove the previous modal-related styles */
+.description-modal,
+.description-content {
+  display: none;
 }
