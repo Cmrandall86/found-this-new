@@ -21,13 +21,19 @@ export default function ProductCard({
 
   useEffect(() => {
     setImageState("loading");
-
+    
+    // First try to use the Sanity image
     if (mainImage) {
       setImageSrc(mainImage);
-    } else if (previewData?.images?.[0]) {
+    }
+    // If no Sanity image, try to use preview image
+    else if (previewData?.images?.[0]) {
       setImageSrc(previewData.images[0]);
-    } else {
+    }
+    // If neither exists, show placeholder
+    else {
       setImageState("no-image");
+      setImageSrc("");
     }
   }, [mainImage, previewData]);
 

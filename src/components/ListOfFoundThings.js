@@ -1,7 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTable, useSortBy } from "react-table";
 import ProductCard from "@/components/ProductCard";
+import imageUrlBuilder from '@sanity/image-url';
+import client from '../../lib/sanityClient';
 import "../../styles/ListOfFoundThings.css";
+
+// Initialize the image URL builder
+const builder = imageUrlBuilder(client);
+
+// Helper function to build image URLs
+function urlFor(source) {
+  return builder.image(source);
+}
 
 export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -103,6 +113,28 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     }
   };
 
+  // Function to get optimized image URL
+  const getOptimizedImageUrl = (mainImage, width = 1200) => {
+    if (!mainImage || !mainImage.asset) {
+      return "https://via.placeholder.com/300x200?text=No+Image";
+    }
+    
+    try {
+      return urlFor(mainImage)
+        .width(1200)
+        .height(800)
+        .format('webp')
+        .quality(95)
+        .fit('clip')
+        .auto('format')
+        .sharpen(10)
+        .url();
+    } catch (error) {
+      console.error('Error generating image URL:', error);
+      return "https://via.placeholder.com/300x200?text=No+Image";
+    }
+  };
+
   return (
     <div>
       <div className="filter-controls">
@@ -139,7 +171,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       <div className="grid-container">
         {rows.map((row) => {
           prepareRow(row);
-          const { title, productURL, price, tags } = row.original;
+          const { title, productURL, price, tags, mainImage } = row.original;
           const previewData = previews[row.original._id];
           const isMenuOpen = showMenu[row.original._id];
           const toggleMenu = () =>
@@ -147,6 +179,9 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               ...prev,
               [row.original._id]: !prev[row.original._id],
             }));
+
+          // Use preview images if no mainImage from Sanity
+          const imageToUse = mainImage ? getOptimizedImageUrl(mainImage) : null;
 
           return (
             <ProductCard
@@ -160,7 +195,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               onDelete={() => onDelete(row.original._id)}
               onEdit={() => onEdit(row.original)}
               tags={tags}
-              mainImage={row.original.mainImage}
+              mainImage={imageToUse}
             />
           );
         })}

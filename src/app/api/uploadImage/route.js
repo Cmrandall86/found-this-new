@@ -12,7 +12,17 @@ export const config = {
 export async function POST(request) {
   try {
     const data = await request.json();
-    const { imageUrl, fileData } = data;
+    const { imageUrl, fileData, options = {} } = data;
+
+    // Default options merged with provided options
+    const imageOptions = {
+      quality: 95,
+      preserveExifData: true,
+      maxWidth: 2400,
+      maxHeight: 1600,
+      format: 'webp',
+      ...options
+    };
 
     let imageAsset = null;
 
@@ -26,6 +36,20 @@ export async function POST(request) {
         imageAsset = await client.assets.upload('image', Buffer.from(buffer), {
           filename: `product-image-${Date.now()}`,
           contentType: response.headers.get('content-type'),
+          // Sanity image options
+          preserveExifData: imageOptions.preserveExifData,
+          extract: {
+            width: imageOptions.maxWidth,
+            height: imageOptions.maxHeight
+          },
+          // Additional Sanity-specific options
+          options: {
+            quality: imageOptions.quality,
+            format: imageOptions.format,
+            autoOrient: true,
+            background: 'white',
+            strip: false
+          }
         });
       } catch (error) {
         console.error('Error uploading image from URL:', error);
@@ -37,7 +61,19 @@ export async function POST(request) {
         const buffer = Buffer.from(fileData.split(',')[1], 'base64');
         imageAsset = await client.assets.upload('image', buffer, {
           filename: `product-image-${Date.now()}`,
-          contentType: 'image/jpeg', // Adjust based on file type
+          contentType: `image/${imageOptions.format}`,
+          // Sanity image options
+          preserveExifData: imageOptions.preserveExifData,
+          extract: {
+            width: imageOptions.maxWidth,
+            height: imageOptions.maxHeight
+          },
+          // Additional Sanity-specific options
+          options: {
+            quality: imageOptions.quality,
+            format: imageOptions.format,
+            autoOrient: true
+          }
         });
       } catch (error) {
         console.error('Error uploading file:', error);
@@ -54,6 +90,15 @@ export async function POST(request) {
       asset: {
         _type: 'reference',
         _ref: imageAsset._id
+      },
+      // Include metadata about the upload
+      metadata: {
+        quality: imageOptions.quality,
+        format: imageOptions.format,
+        dimensions: {
+          width: imageAsset.metadata?.dimensions?.width,
+          height: imageAsset.metadata?.dimensions?.height
+        }
       }
     });
 

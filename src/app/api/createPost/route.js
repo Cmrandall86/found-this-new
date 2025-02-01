@@ -18,6 +18,14 @@ export async function POST(request) {
           body: JSON.stringify({
             imageUrl: data.imageUrl,
             fileData: data.fileData,
+            // Add quality settings
+            options: {
+              quality: 90, // Set quality (0-100)
+              preserveExifData: true, // Preserve image metadata
+              maxWidth: 2000, // Maximum width
+              maxHeight: 2000, // Maximum height
+              format: 'webp' // Use modern format
+            }
           }),
         });
 
@@ -41,11 +49,12 @@ export async function POST(request) {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       mainImage: mainImage || null,
-      // Add metadata for the image if needed
       imageMetadata: mainImage ? {
         _type: 'imageMetadata',
         source: data.imageUrl ? 'url' : 'upload',
         uploadedAt: new Date().toISOString(),
+        quality: 90, // Store the quality setting used
+        format: 'webp' // Store the format used
       } : null
     });
 
