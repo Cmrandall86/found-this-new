@@ -198,17 +198,16 @@ body.dark-mode .menu-button.active {
 
 /* Image Container */
 .image-container {
+  position: relative;
   width: 100%;
   height: 200px;
-  border-radius: 16px;
+  background: var(--card-background);
+  border-radius: 8px;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  margin-bottom: 16px;
-  position: relative;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  padding: 12px;
 }
 
 .image-container:hover {
@@ -253,7 +252,9 @@ body.dark-mode .image-container {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  transition: transform 0.3s ease;
+  transition: opacity 0.3s ease;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .preview-thumbnail.loaded {
@@ -308,6 +309,7 @@ body.dark-mode .product-card-tag {
 
   .image-container {
     height: 180px;
+    padding: 10px;
   }
 
   .product-card-title {
@@ -357,6 +359,7 @@ body.dark-mode .product-card-tag {
 
   .image-container {
     height: 160px;
+    padding: 8px;
   }
 
   .product-card-title {
@@ -395,41 +398,29 @@ body.dark-mode .product-card-tag {
 /* Loading Animation */
 .loading-animation {
   position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
-  background: linear-gradient(110deg, var(--glass-background) 30%, var(--glass-border) 50%, var(--glass-background) 70%);
-  background-size: 200% 100%;
-  animation: loading-wave 1.5s infinite;
-  gap: 12px;
-}
-
-.loading-animation span {
-  font-size: 0.8rem;
-  color: var(--text-color-light);
+  justify-content: center;
+  background: var(--card-background);
 }
 
 .loading-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid rgba(0, 0, 0, 0.1);
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--primary-green);
   border-radius: 50%;
-  border-top-color: var(--secondary-color);
-  animation: spin 1s ease-in-out infinite;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
-}
-
-@keyframes loading-wave {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
 }
 
 body.dark-mode .loading-animation {
@@ -455,11 +446,11 @@ body.dark-mode .loading-animation span {
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  background: linear-gradient(145deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.05));
-  border-radius: 12px;
-  gap: 12px;
+  justify-content: center;
+  background: var(--card-background);
+  color: var(--text-muted);
+  gap: 8px;
 }
 
 .placeholder-container.error {
@@ -476,9 +467,8 @@ body.dark-mode .loading-animation span {
 }
 
 .placeholder-icon {
-  font-size: 2.5rem;
-  opacity: 0.4;
-  color: var(--primary-green);
+  font-size: 2rem;
+  opacity: 0.5;
 }
 
 .placeholder-container span {
@@ -551,6 +541,7 @@ body.dark-mode .placeholder-icon {
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  padding: 8px;
 }
 
 .image-description-overlay {
