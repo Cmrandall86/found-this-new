@@ -25,21 +25,21 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
 
   // Fetch preview data
   const fetchPreviewData = async (url, itemId) => {
-    if (!url) {
-      console.warn("No URL provided for preview fetch");
+    if (!url || fetchedURLs.current.has(itemId)) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}`);
+      const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}&t=${Date.now()}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch preview for URL: ${url}, Status: ${response.status}`);
       }
       const data = await response.json();
-      setPreviews((prev) => ({ ...prev, [itemId]: data }));
+      setPreviews(prev => ({ ...prev, [itemId]: data }));
+      fetchedURLs.current.add(itemId);
     } catch (error) {
       console.error(`Error fetching preview for URL ${url}:`, error.message);
-      setPreviews((prev) => ({
+      setPreviews(prev => ({
         ...prev,
         [itemId]: {
           title: "No Preview Available",
@@ -63,10 +63,10 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
 
   // Fetch previews and apply filters
   useEffect(() => {
+    fetchedURLs.current.clear();
     items.forEach((item) => {
-      if (item.productURL && !fetchedURLs.current.has(item.productURL)) {
+      if (item.productURL) {
         fetchPreviewData(item.productURL, item._id);
-        fetchedURLs.current.add(item.productURL);
       }
     });
 

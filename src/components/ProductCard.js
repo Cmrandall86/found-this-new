@@ -22,7 +22,15 @@ export default function ProductCard({
   const [showDescription, setShowDescription] = useState(false);
 
   // Determine which image to use
-  const imageUrl = mainImage || previewData?.images?.[0] || null;
+  const imageUrl = React.useMemo(() => {
+    if (mainImage) {
+      return mainImage;
+    }
+    if (previewData?.images?.[0]) {
+      return `${previewData.images[0]}?t=${Date.now()}`; // Add cache buster
+    }
+    return null;
+  }, [mainImage, previewData]);
 
   const handleImageLoad = () => {
     setIsLoading(false);

@@ -39,6 +39,8 @@ export async function fetchPreviewUrls(url) {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.5",
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache"
           },
         }),
         5000
@@ -54,23 +56,23 @@ export async function fetchPreviewUrls(url) {
             !img.includes('advertisement') &&
             !img.includes('promotion') &&
             !img.includes('deal') &&
-            img.includes('._'); // Amazon image format marker
+            !img.includes('sprite') &&    // Exclude sprite sheets
+            !img.includes('button') &&    // Exclude buttons
+            !img.includes('logo') &&      // Exclude logos
+            img.includes('._');           // Amazon image format marker
 
           return isProductImage;
         })
         .map((img) => {
           // Extract the base image ID
           const baseUrl = img.split('._')[0];
-          // Request high quality version
-          return `${baseUrl}._AC_SL2000_FMjpg_.jpg`;
+          const timestamp = Date.now();
+          // Use a more reliable Amazon image format
+          return `${baseUrl}._AC_SX679_.jpg?t=${timestamp}`;
         })
-        .filter((img, index, self) => 
-          // Remove duplicates
-          self.indexOf(img) === index
-        )
-        .slice(0, 4);
+        .filter((img, index, self) => self.indexOf(img) === index)
+        .slice(0, 1); // Only take the first image to ensure consistency
 
-      // If no valid product images found, return placeholder
       if (productImages.length === 0) {
         return {
           title: previewData.title || "No title available",
@@ -86,6 +88,7 @@ export async function fetchPreviewUrls(url) {
       };
       
     } catch (error) {
+      console.error("Error fetching preview:", error);
       return {
         title: "Error fetching preview",
         description: "Unable to fetch preview data",
