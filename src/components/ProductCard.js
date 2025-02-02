@@ -27,6 +27,8 @@ export default function ProductCard({
   // Handle image loading
   useEffect(() => {
     const imageUrl = mainImage || (previewData?.images?.[0] || null);
+    
+    // Reset states if no image URL
     if (!imageUrl) {
       setIsLoading(false);
       setHasError(true);
@@ -51,15 +53,17 @@ export default function ProductCard({
         console.error(`Failed to load image for ${title}`);
         setIsLoading(false);
         setHasError(true);
+        // Clear the image source on error
+        if (imageRef.current) {
+          imageRef.current.src = '';
+        }
       }
     };
 
-    // Start loading
     setIsLoading(true);
     setHasError(false);
     img.src = imageUrl;
 
-    // Cleanup
     return () => {
       mountedRef.current = false;
       img.onload = null;

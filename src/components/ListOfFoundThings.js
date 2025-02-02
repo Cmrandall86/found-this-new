@@ -1,17 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTable, useSortBy } from "react-table";
 import ProductCard from "@/components/ProductCard";
-import imageUrlBuilder from '@sanity/image-url';
 import client from '../../lib/sanityClient';
 import "../../styles/ListOfFoundThings.css";
-
-// Initialize the image URL builder
-const builder = imageUrlBuilder(client);
-
-// Helper function to build image URLs
-function urlFor(source) {
-  return builder.image(source);
-}
 
 export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -44,7 +35,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
         [itemId]: {
           title: "No Preview Available",
           description: "Unable to fetch preview data.",
-          images: ["https://via.placeholder.com/300x200?text=No+Image"],
+          images: [] // Don't include a placeholder URL
         },
       }));
     }
@@ -115,17 +106,13 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   };
 
   // Function to get optimized image URL
-  const getOptimizedImageUrl = (mainImage) => {
-    if (!mainImage?.asset?._ref) return null;
+  const getOptimizedImageUrl = (imageUrl) => {
+    if (!imageUrl || imageUrl === "") return null;
     
     try {
-      return urlFor(mainImage)
-        .width(800)
-        .height(600)
-        .quality(90)
-        .url();
+      return imageUrl;
     } catch (error) {
-      console.error('Error generating image URL:', error, mainImage);
+      console.error('Error with image URL:', error);
       return null;
     }
   };
@@ -183,7 +170,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       <div className="grid-container">
         {rows.map((row) => {
           prepareRow(row);
-          const { title, productURL, price, tags, mainImage } = row.original;
+          const { title, productURL, price, tags, imageUrl } = row.original;
           const previewData = previews[row.original._id];
           const isMenuOpen = showMenu[row.original._id];
           const toggleMenu = () =>
@@ -205,7 +192,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               onDelete={() => onDelete(row.original._id)}
               onEdit={() => onEdit(row.original)}
               tags={tags}
-              mainImage={mainImage ? getOptimizedImageUrl(mainImage) : null}
+              mainImage={imageUrl && imageUrl !== "" ? getOptimizedImageUrl(imageUrl) : null}
               postId={row.original._id}
             />
           );
