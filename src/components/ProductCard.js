@@ -16,6 +16,7 @@ export default function ProductCard({
   menuRef,
   tags,
   mainImage,
+  postId,
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -24,22 +25,33 @@ export default function ProductCard({
   // Determine which image to use
   const imageUrl = React.useMemo(() => {
     if (mainImage) {
-      // For Sanity images
-      return mainImage;
+      return mainImage; // Already processed by getOptimizedImageUrl
     }
     if (previewData?.images?.[0]) {
-      // For preview images
-      const timestamp = Date.now();
       const previewUrl = previewData.images[0];
-      return `${previewUrl}${previewUrl.includes('?') ? '&' : '?'}t=${timestamp}`;
+      // Add postId to preview images as well
+      return `${previewUrl}${previewUrl.includes('?') ? '&' : '?'}cacheBuster=${postId}-${Date.now()}`;
     }
     return null;
-  }, [mainImage, previewData]);
+  }, [mainImage, previewData, postId]);
 
-  // Add useEffect to reset loading state when image URL changes
+  // Force image reload when URL changes
   useEffect(() => {
-    setIsLoading(true);
-    setHasError(false);
+    if (imageUrl) {
+      const img = new Image();
+      img.src = imageUrl;
+      setIsLoading(true);
+      setHasError(false);
+      
+      img.onload = () => {
+        setIsLoading(false);
+      };
+      
+      img.onerror = () => {
+        setHasError(true);
+        setIsLoading(false);
+      };
+    }
   }, [imageUrl]);
 
   const handleImageLoad = () => {
