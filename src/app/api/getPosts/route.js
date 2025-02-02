@@ -19,16 +19,34 @@ export async function GET() {
       tags
     }`;
 
-    const posts = await client.fetch(query);
+    // Fetch with no-cache option
+    const posts = await client.fetch(query, {}, {
+      cache: 'no-store'
+    });
     
     console.log('Fetched posts:', posts);
 
-    return NextResponse.json(posts);
+    // Return with cache control headers
+    return NextResponse.json(posts, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Surrogate-Control': 'no-store'
+      }
+    });
+
   } catch (error) {
     console.error('Error fetching posts:', error);
     return NextResponse.json(
       { error: 'Failed to fetch posts', details: error.message },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      }
     );
   }
 }
