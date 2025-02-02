@@ -30,7 +30,7 @@
   status = 200
 
 [build]
-  command = "next build"
+  command = "npm run build"
   publish = ".next"
 
 [functions]
@@ -41,3 +41,8 @@
   NEXT_PUBLIC_SANITY_DATASET = "production"
   NODE_VERSION = "18"
   NEXT_TELEMETRY_DISABLED = "1"
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
+  NODE_ENV = "production"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
