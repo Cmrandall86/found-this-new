@@ -1,17 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTable, useSortBy } from "react-table";
 import ProductCard from "@/components/ProductCard";
-import imageUrlBuilder from '@sanity/image-url';
-import client from '../../lib/sanityClient';
 import "../../styles/ListOfFoundThings.css";
-
-// Initialize the image URL builder
-const builder = imageUrlBuilder(client);
-
-// Helper function to build image URLs
-function urlFor(source) {
-  return builder.image(source);
-}
 
 export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,22 +20,22 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     }
 
     try {
-      const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}&t=${Date.now()}`);
+      const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}`);
       if (!response.ok) {
-        throw new Error(`Failed to fetch preview for URL: ${url}, Status: ${response.status}`);
+        throw new Error(`Failed to fetch preview: ${response.statusText}`);
       }
       const data = await response.json();
       setPreviews(prev => ({ ...prev, [itemId]: data }));
       fetchedURLs.current.add(itemId);
     } catch (error) {
-      console.error(`Error fetching preview for URL ${url}:`, error.message);
+      console.error('Preview fetch error:', error);
       setPreviews(prev => ({
         ...prev,
         [itemId]: {
-          title: "No Preview Available",
-          description: "Unable to fetch preview data.",
-          images: ["https://via.placeholder.com/300x200?text=No+Image"],
-        },
+          title: "Preview Unavailable",
+          description: "Unable to load preview",
+          images: ["https://via.placeholder.com/300x200?text=No+Preview"]
+        }
       }));
     }
   };
@@ -114,28 +104,12 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     }
   };
 
-  // Function to get optimized image URL
-  const getOptimizedImageUrl = (mainImage) => {
-    if (!mainImage?.asset?._ref) return null;
-    
-    try {
-      return urlFor(mainImage)
-        .width(800)
-        .height(600)
-        .quality(90)
-        .url();
-    } catch (error) {
-      console.error('Error generating image URL:', error, mainImage);
-      return null;
-    }
-  };
-
   const toggleFilters = () => setShowFilters(!showFilters);
 
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title header-font">Curated Finds</h1>
+        <h1 className="page-title">Curated Finds</h1>
         <p className="page-subtitle">Discover hand-picked products worth sharing</p>
       </div>
       <div className="filters-section">
@@ -183,7 +157,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       <div className="grid-container">
         {rows.map((row) => {
           prepareRow(row);
-          const { title, productURL, price, tags, mainImage } = row.original;
+          const { title, productURL, price, tags } = row.original;
           const previewData = previews[row.original._id];
           const isMenuOpen = showMenu[row.original._id];
           const toggleMenu = () =>
@@ -205,7 +179,6 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               onDelete={() => onDelete(row.original._id)}
               onEdit={() => onEdit(row.original)}
               tags={tags}
-              mainImage={mainImage ? getOptimizedImageUrl(mainImage) : null}
               postId={row.original._id}
             />
           );

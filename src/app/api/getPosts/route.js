@@ -4,30 +4,37 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // Basic query first to test connection
-    const query = `*[_type == "blogPost"] | order(createdAt desc)`;
+    // Query aligned with schema
+    const query = `*[_type == "blogPost"] | order(createdAt desc) {
+      _id,
+      title,
+      description,
+      productURL,
+      price,
+      tags,
+      createdAt,
+      updatedAt
+    }`;
 
     const posts = await client.fetch(query).catch(err => {
       console.error('Sanity fetch error:', err);
       throw new Error(`Sanity fetch failed: ${err.message}`);
     });
-    
+
     if (!posts) {
-      console.error('No posts returned from Sanity');
       return NextResponse.json({ error: 'No posts found' }, { status: 404 });
     }
 
-    // Transform posts after successful fetch
+    // Transform posts to ensure data consistency
     const transformedPosts = posts.map(post => ({
       _id: post._id,
       title: post.title || 'Untitled',
       description: post.description || '',
       productURL: post.productURL || '',
-      price: typeof post.price === 'number' ? post.price : 0,
-      tags: Array.isArray(post.tags) ? post.tags : [],
-      createdAt: post.createdAt || post._createdAt || new Date().toISOString(),
-      updatedAt: post.updatedAt || post._updatedAt || new Date().toISOString(),
-      mainImage: post.mainImage || null
+      price: Number(post.price || 0).toFixed(2), // Ensure 2 decimal places
+      tags: Array.isArray(post.tags) ? [...new Set(post.tags)].filter(tag => tag.trim()) : [], // Ensure unique tags
+      createdAt: post.createdAt || new Date().toISOString(),
+      updatedAt: post.updatedAt || new Date().toISOString()
     }));
 
     return NextResponse.json(transformedPosts, {

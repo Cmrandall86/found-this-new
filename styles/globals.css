@@ -24,6 +24,7 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
+  font-family: var(--body-font);
 }
 
 body::before {
@@ -41,7 +42,6 @@ body::before {
 }
 
 body.light-mode {
-  font-family: var(--primary-font);
   background-color: var(--background-light);
   color: var(--text-color-light);
   padding: 20px;
@@ -49,7 +49,6 @@ body.light-mode {
 }
 
 body.dark-mode {
-  font-family: var(--primary-font);
   background-color: var(--background-dark);
   color: var(--text-color-dark);
   padding: 20px;
@@ -365,4 +364,38 @@ main {
   .navbar-title {
     font-size: 1.3rem;
   }
+}
+
+:root {
+  /* Font variables */
+  --font-righteous: 'Righteous', cursive;
+  --font-inter: 'Inter', sans-serif;
+  
+  /* Use the font variables */
+  --header-font: var(--font-righteous);
+  --body-font: var(--font-inter);
+  
+  /* Keep your existing variables */
+  --primary-green: #10b981;
+  --primary-green-light: #34d399;
+  /* ... other existing variables ... */
+}
+
+.header-font {
+  font-family: var(--header-font);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--header-font);
+}
+
+/* Update specific classes */
+.page-title {
+  font-family: var(--header-font);
+  /* ... other existing styles ... */
+}
+
+.page-subtitle {
+  font-family: var(--body-font);
+  /* ... other existing styles ... */
 }

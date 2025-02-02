@@ -2,11 +2,17 @@ import React from 'react'
 import { Inter, Righteous } from 'next/font/google'
 import '../../styles/globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+})
+
 const righteous = Righteous({ 
   weight: '400',
   subsets: ['latin'],
   display: 'swap',
+  variable: '--font-righteous',
 })
 
 export const metadata = {
@@ -16,15 +22,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <head>
-        <style>{`
-          :root {
-            --header-font: ${righteous.style.fontFamily};
-            --body-font: ${inter.style.fontFamily};
-          }
-        `}</style>
-      </head>
+    <html lang="en" className={`${inter.variable} ${righteous.variable}`}>
       <body className={inter.className}>
         <main>
           {children}

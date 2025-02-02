@@ -15,57 +15,59 @@ export default function ProductCard({
   onEdit,
   menuRef,
   tags,
-  mainImage,
   postId,
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
+  const [imageUrl, setImageUrl] = useState(null);
   const imageRef = useRef(null);
   const mountedRef = useRef(true);
 
-  // Handle image loading
+  // Effect to handle preview image URL
   useEffect(() => {
-    const imageUrl = mainImage || (previewData?.images?.[0] || null);
+    const url = previewData?.images?.[0] || null;
+    setImageUrl(url);
+  }, [previewData]);
+
+  // Effect to handle image loading
+  useEffect(() => {
     if (!imageUrl) {
       setIsLoading(false);
       setHasError(true);
       return;
     }
 
-    // Create new image instance
+    setIsLoading(true);
+    setHasError(false);
+
     const img = new Image();
     
     img.onload = () => {
       if (mountedRef.current) {
-        setIsLoading(false);
-        setHasError(false);
         if (imageRef.current) {
           imageRef.current.src = imageUrl;
         }
+        setIsLoading(false);
+        setHasError(false);
       }
     };
 
     img.onerror = () => {
       if (mountedRef.current) {
-        console.error(`Failed to load image for ${title}`);
         setIsLoading(false);
         setHasError(true);
       }
     };
 
-    // Start loading
-    setIsLoading(true);
-    setHasError(false);
     img.src = imageUrl;
 
-    // Cleanup
     return () => {
       mountedRef.current = false;
       img.onload = null;
       img.onerror = null;
     };
-  }, [mainImage, previewData, title]);
+  }, [imageUrl]);
 
   const toggleDescription = (e) => {
     e.preventDefault();
