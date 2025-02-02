@@ -1,5 +1,31 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[functions]
+  node_bundler = "esbuild"
+
+[build.environment]
+  NODE_VERSION = "18"
+  NEXT_TELEMETRY_DISABLED = "1"
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
+  NODE_ENV = "production"
+
+# Force no caching for all routes
 [[headers]]
   for = "/*"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+    Surrogate-Control = "no-store"
+
+# Specific no-cache for API routes
+[[headers]]
+  for = "/api/*"
   [headers.values]
     Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate"
     Pragma = "no-cache"
@@ -18,31 +44,7 @@
     Cache-Control = "no-store, no-cache, must-revalidate"
     Pragma = "no-cache"
 
-[[headers]]
-  for = "/api/*"
-  [headers.values]
-    Cache-Control = "no-store, no-cache, must-revalidate"
-    Pragma = "no-cache"
-
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-[build]
-  command = "npm run build"
-  publish = ".next"
-
-[functions]
-  node_bundler = "esbuild"
-
-[build.environment]
-  NEXT_PUBLIC_SANITY_PROJECT_ID = "your-project-id"
-  NEXT_PUBLIC_SANITY_DATASET = "production"
-  NODE_VERSION = "18"
-  NEXT_TELEMETRY_DISABLED = "1"
-  NETLIFY_NEXT_PLUGIN_SKIP = "true"
-  NODE_ENV = "production"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
