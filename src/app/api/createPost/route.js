@@ -20,7 +20,7 @@ export async function POST(request) {
       description: (data.description || '').trim(),
       productURL: data.productURL.trim(),
       price: Number(data.price),
-      imageUrl: (data.imageUrl || '').trim(),
+      mainImage: data.mainImage, // This should be a Sanity image asset reference
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       tags: Array.isArray(data.tags) ? 

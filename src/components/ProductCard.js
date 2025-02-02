@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import MiniMenu from "@/components/MiniMenu";
 import "../../styles/productcard.css";
 import { FaImage } from 'react-icons/fa';
+import { urlFor } from '../../lib/sanityClient';
 
 export default function ProductCard({
   title,
@@ -27,16 +28,13 @@ export default function ProductCard({
   // Handle image loading
   useEffect(() => {
     const getImageUrl = () => {
-      // First try the direct imageUrl from Sanity
-      if (mainImage && mainImage !== '') {
-        return mainImage;
+      // First try the Sanity image
+      if (mainImage?.asset?._ref) {
+        return urlFor(mainImage).url();
       }
-      // Then try preview images
+      // Then try preview images if available
       if (previewData?.images?.length > 0) {
-        const previewUrl = previewData.images[0];
-        if (previewUrl && previewUrl !== '') {
-          return previewUrl;
-        }
+        return previewData.images[0];
       }
       return null;
     };

@@ -30,12 +30,12 @@ export default {
       validation: Rule => Rule.required().min(0).precision(2)
     },
     { 
-      name: "imageUrl", 
-      title: "Image URL", 
-      type: "url",
-      validation: Rule => Rule.uri({
-        scheme: ['http', 'https']
-      })
+      name: "mainImage",
+      title: "Main Image",
+      type: "image",
+      options: {
+        hotspot: true
+      }
     },
     {
       name: "createdAt",
@@ -71,14 +71,14 @@ export default {
     select: {
       title: 'title',
       subtitle: 'price',
-      media: 'imageUrl'
+      media: 'mainImage'
     },
     prepare(selection) {
       const {title, subtitle, media} = selection
       return {
         title: title,
         subtitle: subtitle ? `$${subtitle}` : 'No price set',
-        media: media ? media : null
+        media: media
       }
     }
   }
