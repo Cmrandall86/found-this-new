@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import MiniMenu from "@/components/MiniMenu";
 import "../../styles/productcard.css";
 import { FaImage } from 'react-icons/fa';
@@ -21,48 +21,51 @@ export default function ProductCard({
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
+  const imageRef = useRef(null);
+  const mountedRef = useRef(true);
 
-  // Determine which image to use
-  const imageUrl = React.useMemo(() => {
-    if (mainImage) {
-      return mainImage; // Already processed by getOptimizedImageUrl
-    }
-    if (previewData?.images?.[0]) {
-      const previewUrl = previewData.images[0];
-      // Add postId to preview images as well
-      return `${previewUrl}${previewUrl.includes('?') ? '&' : '?'}cacheBuster=${postId}-${Date.now()}`;
-    }
-    return null;
-  }, [mainImage, previewData, postId]);
-
-  // Force image reload when URL changes
+  // Handle image loading
   useEffect(() => {
-    if (imageUrl) {
-      const img = new Image();
-      img.src = imageUrl;
-      setIsLoading(true);
-      setHasError(false);
-      
-      img.onload = () => {
-        setIsLoading(false);
-      };
-      
-      img.onerror = () => {
-        setHasError(true);
-        setIsLoading(false);
-      };
+    const imageUrl = mainImage || (previewData?.images?.[0] || null);
+    if (!imageUrl) {
+      setIsLoading(false);
+      setHasError(true);
+      return;
     }
-  }, [imageUrl]);
 
-  const handleImageLoad = () => {
-    setIsLoading(false);
-  };
+    // Create new image instance
+    const img = new Image();
+    
+    img.onload = () => {
+      if (mountedRef.current) {
+        setIsLoading(false);
+        setHasError(false);
+        if (imageRef.current) {
+          imageRef.current.src = imageUrl;
+        }
+      }
+    };
 
-  const handleImageError = () => {
-    console.error(`Image failed to load for ${title}:`, imageUrl);
-    setHasError(true);
-    setIsLoading(false);
-  };
+    img.onerror = () => {
+      if (mountedRef.current) {
+        console.error(`Failed to load image for ${title}`);
+        setIsLoading(false);
+        setHasError(true);
+      }
+    };
+
+    // Start loading
+    setIsLoading(true);
+    setHasError(false);
+    img.src = imageUrl;
+
+    // Cleanup
+    return () => {
+      mountedRef.current = false;
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [mainImage, previewData, title]);
 
   const toggleDescription = (e) => {
     e.preventDefault();
@@ -88,7 +91,7 @@ export default function ProductCard({
           </div>
         )}
         
-        {!imageUrl || hasError ? (
+        {hasError ? (
           <div className="placeholder-container">
             <FaImage className="placeholder-icon" />
             <span>No Image Available</span>
@@ -96,14 +99,14 @@ export default function ProductCard({
         ) : (
           <div className="image-with-description">
             <img
-              src={imageUrl}
+              ref={imageRef}
               alt={title || "Product image"}
               className={`preview-thumbnail ${!isLoading ? 'loaded' : ''}`}
-              onLoad={handleImageLoad}
-              onError={handleImageError}
               onClick={toggleDescription}
-              style={{ display: isLoading ? 'none' : 'block' }}
-              key={imageUrl} // Add key to force re-render when URL changes
+              style={{ 
+                opacity: isLoading ? 0 : 1,
+                transition: 'opacity 0.3s ease'
+              }}
             />
             {showDescription && (
               <div className="image-description-overlay">

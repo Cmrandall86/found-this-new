@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import ListOfFoundThings from "@/components/ListOfFoundThings";
 import UploadForm from "@/components/UploadForm";
@@ -9,8 +9,8 @@ export default function HomePage() {
   const [isFormVisible, setFormVisible] = useState(false);
   const [editPost, setEditPost] = useState(null);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
+    try {
       const response = await fetch("/api/getPosts");
       if (response.ok) {
         const data = await response.json();
@@ -18,15 +18,14 @@ export default function HomePage() {
       } else {
         console.error("Failed to fetch posts:", response.statusText);
       }
-    };
-    fetchPosts();
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
   }, []);
 
-
-  const handleToggleForm = () => {
-    setFormVisible((prev) => !prev);
-    if (isFormVisible) setEditPost(null); // Reset editPost if closing form
-  };
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
   const handleFormSubmit = async (newPost) => {
     try {
@@ -45,10 +44,10 @@ export default function HomePage() {
         if (response.ok) {
           const updatedPost = await response.json();
           setPosts((prevPosts) =>
-            prevPosts.map((post) => (post._id === updatedPost._id ? updatedPost : post))
+            prevPosts.map((post) => 
+              post._id === updatedPost._id ? updatedPost : post
+            )
           );
-        } else {
-          console.error("Failed to update post:", response.statusText);
         }
       } else {
         const response = await fetch("/api/createPost", {
@@ -57,30 +56,30 @@ export default function HomePage() {
           body: JSON.stringify({
             ...newPost,
             price: Number(newPost.price),
-            authorId: "446810ab-8ae8-4fa2-85bf-46e0d04bd72d",
+            createdAt: new Date().toISOString(),
           }),
         });
 
         if (response.ok) {
           const createdPost = await response.json();
           setPosts((prevPosts) => [...prevPosts, createdPost]);
-        } else {
-          console.error("Failed to create post:", response.statusText);
         }
       }
+      setFormVisible(false);
+      setEditPost(null);
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error("Error submitting post:", error);
     }
   };
 
   const handleDelete = async (postId) => {
     try {
-      const response = await fetch(`/api/deletePost?id=${postId}`, { method: "DELETE" });
+      const response = await fetch(`/api/deletePost?id=${postId}`, { 
+        method: "DELETE" 
+      });
 
       if (response.ok) {
         setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
-      } else {
-        console.error("Failed to delete post:", response.statusText);
       }
     } catch (error) {
       console.error("Error deleting post:", error);
@@ -90,6 +89,13 @@ export default function HomePage() {
   const handleEdit = (post) => {
     setEditPost(post);
     setFormVisible(true);
+  };
+
+  const handleToggleForm = () => {
+    setFormVisible((prev) => !prev);
+    if (isFormVisible) {
+      setEditPost(null);
+    }
   };
 
   return (
@@ -105,7 +111,7 @@ export default function HomePage() {
               <UploadForm
                 onSubmit={handleFormSubmit}
                 editPost={editPost}
-                onClose={() => setFormVisible(false)} // Close form immediately after submission
+                onClose={() => setFormVisible(false)}
               />
             </>
           )}
@@ -113,7 +119,11 @@ export default function HomePage() {
 
         <div className={`right-column ${isFormVisible ? "" : "expanded"}`}>
           <div className="outer-scroll">
-            <ListOfFoundThings items={posts} onDelete={handleDelete} onEdit={handleEdit} />
+            <ListOfFoundThings 
+              items={posts} 
+              onDelete={handleDelete} 
+              onEdit={handleEdit}
+            />
           </div>
         </div>
       </div>

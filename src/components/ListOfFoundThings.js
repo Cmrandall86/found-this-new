@@ -63,15 +63,15 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
 
   // Fetch previews and apply filters
   useEffect(() => {
-    fetchedURLs.current.clear();
+    // Only fetch previews for items that don't have them yet
     items.forEach((item) => {
-      if (item.productURL) {
+      if (item.productURL && !previews[item._id]) {
         fetchPreviewData(item.productURL, item._id);
       }
     });
 
     handleTagFilter(selectedTag);
-  }, [items, selectedTag, searchQuery]);
+  }, [items]); // Only depend on items changing
 
   const uniqueTags = [...new Set(items.flatMap((item) => item.tags || []))].filter((tag) => tag.trim() !== "");
 
@@ -119,12 +119,11 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     if (!mainImage?.asset?._ref) return null;
     
     try {
-      // Add a unique identifier for each image using the full asset reference
-      const imageUrl = urlFor(mainImage);
-      if (!imageUrl) return null;
-      
-      // Add a timestamp to force reload and prevent caching
-      return `${imageUrl}&t=${Date.now()}`;
+      return urlFor(mainImage)
+        .width(800)
+        .height(600)
+        .quality(90)
+        .url();
     } catch (error) {
       console.error('Error generating image URL:', error, mainImage);
       return null;
@@ -195,7 +194,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
 
           return (
             <ProductCard
-              key={`${row.original._id}-${Date.now()}`}
+              key={row.original._id}
               title={title}
               description={row.original.description}
               productURL={productURL}
