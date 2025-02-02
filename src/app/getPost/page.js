@@ -46,12 +46,13 @@ export default function FoundThingsPage() {
   return (
     <div>
       <h1>Found Things</h1>
+      <h2 className="text-gray-600 text-lg mb-6">
+        Discover Randall's hand-picked products worth sharing
+      </h2>
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <>
         <ListOfFoundThings items={items} onDelete={handleDelete} />
-        </>
       )}
     </div>
   );

@@ -125,7 +125,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     <div>
       <div className="page-header">
         <h1 className="page-title">Curated Finds</h1>
-        <p className="page-subtitle">Discover hand-picked products worth sharing</p>
+        <p className="page-subtitle">Discover Randall's hand-picked products worth sharing</p>
       </div>
       <div className="filters-section">
         <button 
