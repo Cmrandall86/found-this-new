@@ -1,83 +1,52 @@
 // src/app/api/getPosts/route.js
 import { NextResponse } from 'next/server';
-import client from '../../../../lib/sanityClient';
+import { createClient } from '@sanity/client';
 
 export async function GET() {
   try {
-    console.log('Sanity client config:', {
-      projectId: client.config().projectId,
-      dataset: client.config().dataset,
-      apiVersion: client.config().apiVersion,
-      useCdn: client.config().useCdn
-    });
-
-    // Query all blog posts, ordered by createdAt desc
-    const query = `*[_type == "blogPost"] | order(createdAt desc) {
-      _id,
-      title,
-      description,
-      productURL,
-      price,
-      previewImage,
-      previewTitle,
-      previewDescription,
-      createdAt,
-      updatedAt,
-      tags
-    }`;
-
-    // Force fresh data from Sanity
-    const posts = await client.fetch(query, {}, {
-      cache: 'no-store',
+    // Force a new client instance for this request
+    const freshClient = createClient({
+      projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+      dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
+      apiVersion: '2024-02-02',
       useCdn: false,
       perspective: 'published'
     });
+
+    const query = `*[_type == "blogPost"] | order(createdAt desc)`;
     
-    console.log('Raw posts from Sanity:', posts);
+    // Log the query and config for debugging
+    console.log('Query:', query);
+    console.log('Client config:', freshClient.config());
 
-    // Transform posts to ensure data consistency
-    const transformedPosts = posts.map(post => ({
-      _id: post._id,
-      title: post.title || '',
-      description: post.description || '',
-      productURL: post.productURL || '',
-      price: typeof post.price === 'number' ? post.price : 0,
-      previewImage: post.previewImage || '',
-      previewTitle: post.previewTitle || '',
-      previewDescription: post.previewDescription || '',
-      createdAt: post.createdAt || new Date().toISOString(),
-      updatedAt: post.updatedAt || new Date().toISOString(),
-      tags: Array.isArray(post.tags) ? post.tags.filter(Boolean) : []
-    }));
+    const posts = await freshClient.fetch(query, {}, {
+      cache: 'no-store'
+    });
 
-    console.log('Transformed posts:', transformedPosts);
+    console.log('Posts from Sanity:', posts);
 
-    return new NextResponse(JSON.stringify(transformedPosts), {
+    return new NextResponse(JSON.stringify(posts), {
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
         'Pragma': 'no-cache',
-        'Expires': '0',
-        'Surrogate-Control': 'no-store'
+        'Expires': '0'
       }
     });
 
   } catch (error) {
-    console.error('Error fetching posts:', error);
+    console.error('Error in getPosts:', error);
     return new NextResponse(
-      JSON.stringify({ 
-        error: 'Failed to fetch posts', 
+      JSON.stringify({
+        error: 'Failed to fetch posts',
         details: error.message,
-        config: client.config()
-      }), 
-      { 
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-store, no-cache, must-revalidate',
-          'Pragma': 'no-cache'
+        env: {
+          hasProjectId: !!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+          hasDataset: !!process.env.NEXT_PUBLIC_SANITY_DATASET,
+          hasToken: !!process.env.SANITY_API_TOKEN
         }
-      }
+      }),
+      { status: 500 }
     );
   }
 }
