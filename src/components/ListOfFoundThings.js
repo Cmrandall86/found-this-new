@@ -181,8 +181,6 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               [row.original._id]: !prev[row.original._id],
             }));
 
-          console.log('Row data:', row.original); // Check what data we're getting from Sanity
-
           return (
             <ProductCard
               key={row.original._id}

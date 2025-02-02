@@ -1,27 +1,22 @@
 // Helper function to get the best Amazon product image
 export const getBestAmazonImage = (images) => {
-  if (!images?.length) return null;
+  if (!images?.length) {
+    console.log('No images provided');
+    return null;
+  }
 
-  const productImages = images.filter(url => {
-    const urlString = String(url);
-    return (
-      (urlString.includes('m.media-amazon.com/images/') || 
-       urlString.includes('images-na.ssl-images-amazon.com/images/')) &&
-      urlString.includes('/I/') &&
-      !urlString.includes('fls-na.amazon.com') &&
-      !urlString.includes('uedata') &&
-      !urlString.includes('batch/1/op') &&
-      !urlString.includes('grey-pixel') &&
-      !urlString.includes('transparent-pixel')
-    );
-  });
+  console.log('All received images:', images);
 
-  if (!productImages.length) return null;
+  // Look for the AC_SR150,300 format first (best format)
+  const srImage = images.find(url => 
+    url.includes('.__AC_SR150,300___')
+  );
 
-  const mainImage = productImages.find(url => {
-    const urlString = String(url);
-    return urlString.includes('_AC_') && urlString.includes('_QL70_');
-  });
+  if (srImage) {
+    console.log('Found SR image:', srImage);
+    return srImage;
+  }
 
-  return mainImage || productImages[0];
+  // If no SR image found, return the first image (should already be filtered by fetchPreview)
+  return images[0] || null;
 }; 

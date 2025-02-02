@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // Query aligned with schema, with cache disabled
+    // Update query to include preview fields
     const query = `*[_type == "blogPost"] | order(createdAt desc) {
       _id,
       title,
@@ -13,13 +13,15 @@ export async function GET() {
       price,
       tags,
       createdAt,
-      updatedAt
+      updatedAt,
+      previewImage,
+      previewTitle,
+      previewDescription
     }`;
 
-    // Use fetch with cache disabled
     const posts = await client.fetch(query, {}, {
-      cache: 'no-cache',  // Disable Sanity CDN cache
-      perspective: 'published'  // Get only published documents
+      cache: 'no-cache',
+      perspective: 'published'
     });
 
     if (!posts) {
@@ -35,7 +37,10 @@ export async function GET() {
       price: Number(post.price || 0),
       tags: Array.isArray(post.tags) ? [...new Set(post.tags)].filter(tag => tag.trim()) : [],
       createdAt: post.createdAt || new Date().toISOString(),
-      updatedAt: post.updatedAt || new Date().toISOString()
+      updatedAt: post.updatedAt || new Date().toISOString(),
+      previewImage: post.previewImage || '',
+      previewTitle: post.previewTitle || '',
+      previewDescription: post.previewDescription || ''
     }));
 
     return NextResponse.json(transformedPosts, {
