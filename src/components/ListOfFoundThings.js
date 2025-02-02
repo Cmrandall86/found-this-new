@@ -115,19 +115,16 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   };
 
   // Function to get optimized image URL
-  const getOptimizedImageUrl = (mainImage, postId) => {
+  const getOptimizedImageUrl = (mainImage) => {
     if (!mainImage?.asset?._ref) return null;
     
     try {
-      const assetId = mainImage.asset._ref.split('-')[1];
-      const imageUrl = urlFor(mainImage)
-        .width(800)
-        .height(600)
-        .quality(90)
-        .url();
-        
-      // Add both post ID and asset ID to prevent caching conflicts
-      return `${imageUrl}&postId=${postId}&assetId=${assetId}`;
+      // Add a unique identifier for each image using the full asset reference
+      const imageUrl = urlFor(mainImage);
+      if (!imageUrl) return null;
+      
+      // Add a timestamp to force reload and prevent caching
+      return `${imageUrl}&t=${Date.now()}`;
     } catch (error) {
       console.error('Error generating image URL:', error, mainImage);
       return null;
@@ -198,7 +195,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
 
           return (
             <ProductCard
-              key={`${row.original._id}-${mainImage?.asset?._ref || 'no-image'}`}
+              key={`${row.original._id}-${Date.now()}`}
               title={title}
               description={row.original.description}
               productURL={productURL}
@@ -209,7 +206,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               onDelete={() => onDelete(row.original._id)}
               onEdit={() => onEdit(row.original)}
               tags={tags}
-              mainImage={mainImage ? getOptimizedImageUrl(mainImage, row.original._id) : null}
+              mainImage={mainImage ? getOptimizedImageUrl(mainImage) : null}
               postId={row.original._id}
             />
           );
