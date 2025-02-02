@@ -8,7 +8,9 @@ export default function ProductCard({
   description,
   productURL,
   price,
-  previewData,
+  previewImage,
+  previewTitle,
+  previewDescription,
   isMenuOpen,
   toggleMenu,
   onDelete,
@@ -20,54 +22,39 @@ export default function ProductCard({
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
-  const [imageUrl, setImageUrl] = useState(null);
   const imageRef = useRef(null);
-  const mountedRef = useRef(true);
 
-  // Effect to handle preview image URL
   useEffect(() => {
-    const url = previewData?.images?.[0] || null;
-    setImageUrl(url);
-  }, [previewData]);
-
-  // Effect to handle image loading
-  useEffect(() => {
-    if (!imageUrl) {
+    console.log('Preview image URL:', previewImage);
+    if (!previewImage) {
+      console.log('No preview image provided');
       setIsLoading(false);
       setHasError(true);
       return;
     }
 
-    setIsLoading(true);
-    setHasError(false);
-
     const img = new Image();
-    
     img.onload = () => {
-      if (mountedRef.current) {
-        if (imageRef.current) {
-          imageRef.current.src = imageUrl;
-        }
-        setIsLoading(false);
-        setHasError(false);
+      if (imageRef.current) {
+        imageRef.current.src = previewImage;
       }
+      setIsLoading(false);
+      setHasError(false);
     };
 
     img.onerror = () => {
-      if (mountedRef.current) {
-        setIsLoading(false);
-        setHasError(true);
-      }
+      console.error('Failed to load image:', previewImage);
+      setIsLoading(false);
+      setHasError(true);
     };
 
-    img.src = imageUrl;
+    img.src = previewImage;
 
     return () => {
-      mountedRef.current = false;
       img.onload = null;
       img.onerror = null;
     };
-  }, [imageUrl]);
+  }, [previewImage]);
 
   const toggleDescription = (e) => {
     e.preventDefault();
@@ -102,7 +89,7 @@ export default function ProductCard({
           <div className="image-with-description">
             <img
               ref={imageRef}
-              alt={title || "Product image"}
+              alt={title || previewTitle || "Product image"}
               className={`preview-thumbnail ${!isLoading ? 'loaded' : ''}`}
               onClick={toggleDescription}
               style={{ 
@@ -113,7 +100,7 @@ export default function ProductCard({
             {showDescription && (
               <div className="image-description-overlay">
                 <button className="close-description" onClick={toggleDescription}>×</button>
-                <p>{description || previewData?.description || "No description available"}</p>
+                <p>{description || previewDescription || "No description available"}</p>
               </div>
             )}
           </div>

@@ -15,18 +15,28 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
 
   // Fetch preview data
   const fetchPreviewData = async (url, itemId) => {
-    if (!url || fetchedURLs.current.has(itemId)) {
+    if (!url) {
+      console.log('No URL provided for itemId:', itemId);
       return;
     }
 
     try {
-      const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}`);
+      // Add timestamp to prevent browser caching
+      const timestamp = Date.now();
+      const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}&t=${timestamp}`);
+      
       if (!response.ok) {
         throw new Error(`Failed to fetch preview: ${response.statusText}`);
       }
+
       const data = await response.json();
+      console.log('Preview data received for:', url, data);
+
+      if (!data || !data.images) {
+        throw new Error('Invalid preview data received');
+      }
+
       setPreviews(prev => ({ ...prev, [itemId]: data }));
-      fetchedURLs.current.add(itemId);
     } catch (error) {
       console.error('Preview fetch error:', error);
       setPreviews(prev => ({
@@ -34,7 +44,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
         [itemId]: {
           title: "Preview Unavailable",
           description: "Unable to load preview",
-          images: ["https://via.placeholder.com/300x200?text=No+Preview"]
+          images: ["https://placehold.co/300x300/e6e6e6/666666?text=No+Preview"]
         }
       }));
     }
@@ -51,15 +61,20 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     setFilteredItems(filtered);
   };
 
-  // Fetch previews and apply filters
+  // Reset previews when items change
   useEffect(() => {
-    // Only fetch previews for items that don't have them yet
-    items.forEach((item) => {
-      if (item.productURL && !previews[item._id]) {
-        fetchPreviewData(item.productURL, item._id);
+    setPreviews({}); // Clear all previews when items change
+    
+    const fetchAllPreviews = async () => {
+      for (const item of items) {
+        if (item.productURL) {
+          console.log('Fetching preview for:', item.productURL);
+          await fetchPreviewData(item.productURL, item._id);
+        }
       }
-    });
+    };
 
+    fetchAllPreviews();
     handleTagFilter(selectedTag);
   }, [items]); // Only depend on items changing
 
@@ -166,6 +181,8 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               [row.original._id]: !prev[row.original._id],
             }));
 
+          console.log('Row data:', row.original); // Check what data we're getting from Sanity
+
           return (
             <ProductCard
               key={row.original._id}
@@ -173,7 +190,9 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               description={row.original.description}
               productURL={productURL}
               price={price}
-              previewData={previewData}
+              previewImage={row.original.previewImage}
+              previewTitle={row.original.previewTitle}
+              previewDescription={row.original.previewDescription}
               isMenuOpen={isMenuOpen}
               toggleMenu={toggleMenu}
               onDelete={() => onDelete(row.original._id)}

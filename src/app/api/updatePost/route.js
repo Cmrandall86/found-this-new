@@ -1,6 +1,8 @@
 // src/app/api/updatePost/route.js
 import client from '../../../../lib/sanityClient';
 import { NextResponse } from 'next/server';
+import { getLinkPreview } from "link-preview-js";
+import { getBestAmazonImage } from "@/utils/amazonImageUtils";
 
 export async function PUT(request) {
   try {
@@ -10,15 +12,27 @@ export async function PUT(request) {
       return NextResponse.json({ error: 'Post ID is required' }, { status: 400 });
     }
 
-    // Update document with schema validation
+    const preview = await getLinkPreview(productURL, {
+      timeout: 10000,
+      headers: {
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      },
+      followRedirects: 'follow'
+    });
+
+    const bestImage = getBestAmazonImage(preview.images);
+
     await client
       .patch(id)
       .set({
         title: title,
         description: description || "",
         productURL: productURL,
-        price: Number(price), // Ensure it's a number, not a string
-        tags: Array.isArray(tags) ? [...new Set(tags)].filter(tag => tag.trim()) : [], // Ensure unique tags
+        price: Number(price),
+        previewImage: bestImage || null,
+        previewTitle: preview.title || '',
+        previewDescription: preview.description || '',
+        tags: Array.isArray(tags) ? [...new Set(tags)].filter(tag => tag.trim()) : [],
         updatedAt: new Date().toISOString()
       })
       .commit();
