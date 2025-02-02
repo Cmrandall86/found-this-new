@@ -3,47 +3,64 @@ export default {
   title: "Blog Post",
   type: "document",
   fields: [
-    { name: "title", title: "Title", type: "string" },
-    { name: "description", title: "Description", type: "text" },
-    { name: "productURL", title: "Product URL", type: "url" },
-    { name: "price", title: "Price", type: "number" },
+    { 
+      name: "title", 
+      title: "Title", 
+      type: "string",
+      validation: Rule => Rule.required()
+    },
+    { 
+      name: "description", 
+      title: "Description", 
+      type: "text" 
+    },
+    { 
+      name: "productURL", 
+      title: "Product URL", 
+      type: "url" 
+    },
+    { 
+      name: "price", 
+      title: "Price", 
+      type: "number",
+      validation: Rule => Rule.min(0)
+    },
     {
       name: "mainImage",
       title: "Main Image",
       type: "image",
       options: {
-        hotspot: true, // Enables UI for selecting focal point
-      },
-      fields: [
-        {
-          name: "alt",
-          type: "string",
-          title: "Alternative Text",
-        },
-        {
-          name: "caption",
-          type: "string",
-          title: "Caption",
-        }
-      ]
+        hotspot: true
+      }
     },
     {
-      name: "imageMetadata",
-      title: "Image Metadata",
-      type: "object",
-      fields: [
-        {
-          name: "source",
-          title: "Source",
-          type: "string"
-        },
-        {
-          name: "uploadedAt",
-          title: "Uploaded At",
-          type: "datetime"
-        }
-      ]
+      name: "createdAt",
+      title: "Created At",
+      type: "datetime",
+      options: {
+        readOnly: true,
+      },
     },
-    // ... other existing fields
-  ]
+    {
+      name: "updatedAt",
+      title: "Updated At",
+      type: "datetime",
+      options: {
+        readOnly: true,
+      },
+    },
+    {
+      name: "tags",
+      title: "Tags",
+      type: "array",
+      of: [{ type: "string" }],
+      description: "Add tags to help categorize your product",
+    },
+  ],
+  preview: {
+    select: {
+      title: 'title',
+      media: 'mainImage'
+    }
+  }
 } 
