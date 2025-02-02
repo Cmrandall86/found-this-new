@@ -7,28 +7,29 @@ export async function POST(request) {
     const data = await request.json();
     
     // Validate required fields
-    if (!data.title) {
+    if (!data.title || !data.productURL || typeof data.price !== 'number') {
       return NextResponse.json({ 
-        error: 'Title is required' 
+        error: 'Missing required fields' 
       }, { status: 400 });
     }
 
     // Create post document matching the schema exactly
     const newPost = await client.create({
       _type: "blogPost",
-      title: data.title,
-      description: data.description || "",
-      productURL: data.productURL || "",
-      price: typeof data.price === 'number' ? data.price : 0,
-      imageUrl: data.imageUrl || "", // matches schema field name exactly
+      title: data.title.trim(),
+      description: (data.description || '').trim(),
+      productURL: data.productURL.trim(),
+      price: Number(data.price),
+      imageUrl: (data.imageUrl || '').trim(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       tags: Array.isArray(data.tags) ? 
-        data.tags.filter(tag => typeof tag === 'string' && tag.trim() !== '') : 
-        []
+        data.tags
+          .filter(tag => typeof tag === 'string' && tag.trim() !== '')
+          .map(tag => tag.trim())
+        : []
     });
 
-    // Return the created post
     return NextResponse.json(newPost);
   } catch (error) {
     console.error('Error creating post:', error);

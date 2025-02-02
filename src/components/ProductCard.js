@@ -27,19 +27,27 @@ export default function ProductCard({
   // Handle image loading
   useEffect(() => {
     const getImageUrl = () => {
-      // Check previewData first since that seems to have working URLs
-      if (previewData?.images?.length > 0) {
-        return previewData.images[0];
-      }
-      // Then try the Sanity imageUrl
+      // First try the direct imageUrl from Sanity
       if (mainImage && mainImage !== '') {
         return mainImage;
+      }
+      // Then try preview images
+      if (previewData?.images?.length > 0) {
+        const previewUrl = previewData.images[0];
+        if (previewUrl && previewUrl !== '') {
+          return previewUrl;
+        }
       }
       return null;
     };
 
     const imageUrl = getImageUrl();
-    console.log('Final image URL:', imageUrl); // Debug log
+    console.log('Image data:', {
+      mainImage,
+      previewImages: previewData?.images,
+      finalUrl: imageUrl,
+      title
+    });
 
     if (!imageUrl) {
       setIsLoading(false);

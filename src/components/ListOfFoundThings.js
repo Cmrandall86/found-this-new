@@ -22,11 +22,17 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // Increase timeout
 
       const response = await fetch(
         `/api/fetchPreview?url=${encodeURIComponent(url)}&t=${Date.now()}`,
-        { signal: controller.signal }
+        { 
+          signal: controller.signal,
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        }
       );
 
       clearTimeout(timeoutId);
@@ -36,10 +42,15 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       }
 
       const data = await response.json();
-      setPreviews(prev => ({ ...prev, [itemId]: data }));
-      fetchedURLs.current.add(itemId);
+      
+      // Only update if we got valid data
+      if (data && (data.images?.length > 0 || data.title)) {
+        setPreviews(prev => ({ ...prev, [itemId]: data }));
+        fetchedURLs.current.add(itemId);
+      }
     } catch (error) {
       console.error(`Error fetching preview for URL ${url}:`, error.message);
+      // Don't cache failed attempts
       setPreviews(prev => ({
         ...prev,
         [itemId]: {
@@ -66,13 +77,15 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   useEffect(() => {
     const fetchBatch = async (items) => {
       for (const item of items) {
-        if (item.productURL && !previews[item._id]) {
+        if (item.productURL && !previews[item._id] && !fetchedURLs.current.has(item._id)) {
           await fetchPreviewData(item.productURL, item._id);
-          // Add a small delay between requests
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Increase delay between requests
         }
       }
     };
+
+    // Reset fetchedURLs when items change
+    fetchedURLs.current = new Set();
 
     const unfetchedItems = items.filter(
       item => item.productURL && !previews[item._id]
@@ -86,6 +99,11 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     }
 
     handleTagFilter(selectedTag);
+
+    // Cleanup function
+    return () => {
+      fetchedURLs.current.clear();
+    };
   }, [items]);
 
   const uniqueTags = [...new Set(items.flatMap((item) => item.tags || []))].filter((tag) => tag.trim() !== "");
