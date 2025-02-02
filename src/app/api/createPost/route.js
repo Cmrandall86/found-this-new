@@ -6,19 +6,29 @@ export async function POST(request) {
   try {
     const data = await request.json();
     
-    // Create the post document using the current schema
+    // Validate required fields
+    if (!data.title) {
+      return NextResponse.json({ 
+        error: 'Title is required' 
+      }, { status: 400 });
+    }
+
+    // Create post document matching the schema exactly
     const newPost = await client.create({
       _type: "blogPost",
       title: data.title,
       description: data.description || "",
       productURL: data.productURL || "",
-      price: Number(data.price) || 0,
-      imageUrl: data.imageUrl || "", // Use imageUrl instead of mainImage
+      price: typeof data.price === 'number' ? data.price : 0,
+      imageUrl: data.imageUrl || "", // matches schema field name exactly
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      tags: Array.isArray(data.tags) ? data.tags : []
+      tags: Array.isArray(data.tags) ? 
+        data.tags.filter(tag => typeof tag === 'string' && tag.trim() !== '') : 
+        []
     });
 
+    // Return the created post
     return NextResponse.json(newPost);
   } catch (error) {
     console.error('Error creating post:', error);

@@ -200,8 +200,8 @@ body.dark-mode .menu-button.active {
 .image-container {
   position: relative;
   width: 100%;
-  height: 200px;
-  background: var(--card-background);
+  aspect-ratio: 4/3;
+  background: #f5f5f5;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -244,15 +244,22 @@ body.dark-mode .image-container {
   }
 }
 
+.image-with-description {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
 .preview-thumbnail {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  display: block;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-.preview-thumbnail.loaded {
+.preview-thumbnail[src] {
   opacity: 1;
 }
 
@@ -400,7 +407,7 @@ body.dark-mode .product-card-tag {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--card-background);
+  background: #f5f5f5;
 }
 
 .loading-spinner {
@@ -443,9 +450,9 @@ body.dark-mode .loading-animation span {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--card-background);
-  color: var(--text-muted);
-  gap: 8px;
+  color: #666;
+  background: #f5f5f5;
+  padding: 1rem;
 }
 
 .placeholder-container.error {
@@ -463,7 +470,7 @@ body.dark-mode .loading-animation span {
 
 .placeholder-icon {
   font-size: 2rem;
-  opacity: 0.5;
+  margin-bottom: 0.5rem;
 }
 
 .placeholder-container span {
@@ -526,17 +533,6 @@ body.dark-mode .placeholder-icon {
   --dark-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
   --dark-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --dark-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-}
-
-.image-with-description {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  padding: 8px;
 }
 
 .image-description-overlay {
@@ -698,4 +694,14 @@ body.dark-mode .filter-toggle:hover {
   .filter-toggle-text {
     font-size: 0.8rem;
   }
+}
+
+/* Add debug outline to see container boundaries */
+.image-with-description {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

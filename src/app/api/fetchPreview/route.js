@@ -1,40 +1,28 @@
-import { NextResponse } from "next/server";
-import { fetchPreviewUrls } from '../createPost/fetchPreviewUrls';
-
-// Helper function for timeout
-const withTimeout = (promise, timeout = 5000) => // Shorter timeout: 5 seconds
-  Promise.race([
-    promise,
-    new Promise((_, reject) => setTimeout(() => reject(new Error("Request timeout")), timeout)),
-  ]);
-
-// Local cache to store API responses
-const cache = new Map();
+import { NextResponse } from 'next/server';
+import { fetchPreviewUrls } from '../../../utils/previewUtils';
 
 export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const url = searchParams.get('url');
+
+  if (!url) {
+    return NextResponse.json({ error: 'URL is required' }, { status: 400 });
+  }
+
   try {
-    const { searchParams } = new URL(request.url);
-    const url = searchParams.get("url");
-
-    if (!url) {
-      return NextResponse.json({
-        title: "No URL provided",
-        description: "Please provide a valid URL",
-        images: ["https://via.placeholder.com/300x200?text=No+URL"]
-      }, { status: 200 });
-    }
-
     const previewData = await fetchPreviewUrls(url);
     
-    // Always return a 200 status with our formatted response
-    return NextResponse.json(previewData, { status: 200 });
-
+    return NextResponse.json(previewData, {
+      headers: {
+        'Cache-Control': 'public, max-age=3600',
+      }
+    });
   } catch (error) {
-    // Return a 200 status with error information in the response
+    console.error('Error in fetchPreview:', error);
     return NextResponse.json({
-      title: "Error fetching preview",
-      description: "Unable to fetch preview data",
-      images: ["https://via.placeholder.com/300x200?text=Error+Loading+Preview"]
-    }, { status: 200 });
+      title: 'Preview Unavailable',
+      description: 'Unable to load preview data',
+      images: []
+    });
   }
 }

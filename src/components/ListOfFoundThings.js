@@ -21,10 +21,20 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     }
 
     try {
-      const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}&t=${Date.now()}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+      const response = await fetch(
+        `/api/fetchPreview?url=${encodeURIComponent(url)}&t=${Date.now()}`,
+        { signal: controller.signal }
+      );
+
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        throw new Error(`Failed to fetch preview for URL: ${url}, Status: ${response.status}`);
+        throw new Error(`Failed to fetch preview: ${response.statusText}`);
       }
+
       const data = await response.json();
       setPreviews(prev => ({ ...prev, [itemId]: data }));
       fetchedURLs.current.add(itemId);
@@ -33,9 +43,9 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       setPreviews(prev => ({
         ...prev,
         [itemId]: {
-          title: "No Preview Available",
-          description: "Unable to fetch preview data.",
-          images: [] // Don't include a placeholder URL
+          title: "Preview Unavailable",
+          description: "Unable to load preview data",
+          images: []
         },
       }));
     }
@@ -54,15 +64,29 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
 
   // Fetch previews and apply filters
   useEffect(() => {
-    // Only fetch previews for items that don't have them yet
-    items.forEach((item) => {
-      if (item.productURL && !previews[item._id]) {
-        fetchPreviewData(item.productURL, item._id);
+    const fetchBatch = async (items) => {
+      for (const item of items) {
+        if (item.productURL && !previews[item._id]) {
+          await fetchPreviewData(item.productURL, item._id);
+          // Add a small delay between requests
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
       }
-    });
+    };
+
+    const unfetchedItems = items.filter(
+      item => item.productURL && !previews[item._id]
+    );
+
+    // Process in smaller batches
+    const batchSize = 2;
+    for (let i = 0; i < unfetchedItems.length; i += batchSize) {
+      const batch = unfetchedItems.slice(i, i + batchSize);
+      fetchBatch(batch);
+    }
 
     handleTagFilter(selectedTag);
-  }, [items]); // Only depend on items changing
+  }, [items]);
 
   const uniqueTags = [...new Set(items.flatMap((item) => item.tags || []))].filter((tag) => tag.trim() !== "");
 
@@ -102,18 +126,6 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       toggleSortBy("createdAt", true);
     } else if (value === "dateOldest") {
       toggleSortBy("createdAt", false);
-    }
-  };
-
-  // Function to get optimized image URL
-  const getOptimizedImageUrl = (imageUrl) => {
-    if (!imageUrl || imageUrl === "") return null;
-    
-    try {
-      return imageUrl;
-    } catch (error) {
-      console.error('Error with image URL:', error);
-      return null;
     }
   };
 
@@ -173,6 +185,15 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
           const { title, productURL, price, tags, imageUrl } = row.original;
           const previewData = previews[row.original._id];
           const isMenuOpen = showMenu[row.original._id];
+          
+          // Debug log to check what data we're getting
+          console.log('Row data:', {
+            id: row.original._id,
+            title,
+            imageUrl: row.original.imageUrl,
+            previewData
+          });
+
           const toggleMenu = () =>
             setShowMenu((prev) => ({
               ...prev,
@@ -192,7 +213,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               onDelete={() => onDelete(row.original._id)}
               onEdit={() => onEdit(row.original)}
               tags={tags}
-              mainImage={imageUrl && imageUrl !== "" ? getOptimizedImageUrl(imageUrl) : null}
+              mainImage={row.original.imageUrl}
               postId={row.original._id}
             />
           );

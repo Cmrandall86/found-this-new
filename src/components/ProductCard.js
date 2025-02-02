@@ -26,36 +26,53 @@ export default function ProductCard({
 
   // Handle image loading
   useEffect(() => {
-    const imageUrl = mainImage || (previewData?.images?.[0] || null);
-    
-    // Reset states if no image URL
+    const getImageUrl = () => {
+      // Check previewData first since that seems to have working URLs
+      if (previewData?.images?.length > 0) {
+        return previewData.images[0];
+      }
+      // Then try the Sanity imageUrl
+      if (mainImage && mainImage !== '') {
+        return mainImage;
+      }
+      return null;
+    };
+
+    const imageUrl = getImageUrl();
+    console.log('Final image URL:', imageUrl); // Debug log
+
     if (!imageUrl) {
       setIsLoading(false);
       setHasError(true);
+      if (imageRef.current) {
+        imageRef.current.removeAttribute('src');
+      }
       return;
     }
 
-    // Create new image instance
     const img = new Image();
-    
+    let mounted = true;
+
     img.onload = () => {
-      if (mountedRef.current) {
+      if (mounted && imageRef.current) {
+        console.log('Image loaded successfully:', imageUrl);
+        imageRef.current.src = imageUrl;
+        imageRef.current.style.opacity = '1';
         setIsLoading(false);
         setHasError(false);
-        if (imageRef.current) {
-          imageRef.current.src = imageUrl;
-        }
       }
     };
 
     img.onerror = () => {
-      if (mountedRef.current) {
-        console.error(`Failed to load image for ${title}`);
+      if (mounted) {
+        console.error('Image failed to load:', {
+          url: imageUrl,
+          title,
+        });
         setIsLoading(false);
         setHasError(true);
-        // Clear the image source on error
         if (imageRef.current) {
-          imageRef.current.src = '';
+          imageRef.current.removeAttribute('src');
         }
       }
     };
@@ -65,7 +82,7 @@ export default function ProductCard({
     img.src = imageUrl;
 
     return () => {
-      mountedRef.current = false;
+      mounted = false;
       img.onload = null;
       img.onerror = null;
     };
@@ -95,31 +112,28 @@ export default function ProductCard({
           </div>
         )}
         
-        {hasError ? (
-          <div className="placeholder-container">
-            <FaImage className="placeholder-icon" />
-            <span>No Image Available</span>
-          </div>
-        ) : (
-          <div className="image-with-description">
+        <div className="image-with-description">
+          {hasError ? (
+            <div className="placeholder-container">
+              <FaImage className="placeholder-icon" />
+              <span>No Image Available</span>
+            </div>
+          ) : (
             <img
               ref={imageRef}
               alt={title || "Product image"}
-              className={`preview-thumbnail ${!isLoading ? 'loaded' : ''}`}
+              className="preview-thumbnail"
               onClick={toggleDescription}
-              style={{ 
-                opacity: isLoading ? 0 : 1,
-                transition: 'opacity 0.3s ease'
-              }}
+              style={{ display: isLoading ? 'none' : 'block' }}
             />
-            {showDescription && (
-              <div className="image-description-overlay">
-                <button className="close-description" onClick={toggleDescription}>×</button>
-                <p>{description || previewData?.description || "No description available"}</p>
-              </div>
-            )}
-          </div>
-        )}
+          )}
+          {showDescription && (
+            <div className="image-description-overlay">
+              <button className="close-description" onClick={toggleDescription}>×</button>
+              <p>{description || previewData?.description || "No description available"}</p>
+            </div>
+          )}
+        </div>
       </div>
 
       <h3 className="product-card-title">{title}</h3>
