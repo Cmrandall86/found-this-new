@@ -4,49 +4,68 @@ import { createClient } from '@sanity/client';
 
 export async function GET() {
   try {
+    // Log environment variables (safely)
+    console.log('Environment check:', {
+      hasProjectId: !!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+      hasDataset: !!process.env.NEXT_PUBLIC_SANITY_DATASET,
+      hasToken: !!process.env.SANITY_API_TOKEN,
+      nodeEnv: process.env.NODE_ENV
+    });
+
     // Force a new client instance for this request
     const freshClient = createClient({
       projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
       dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
       apiVersion: '2024-02-02',
       useCdn: false,
-      perspective: 'published'
+      token: process.env.SANITY_API_TOKEN // Include token for authentication
     });
 
-    const query = `*[_type == "blogPost"] | order(createdAt desc)`;
-    
-    // Log the query and config for debugging
-    console.log('Query:', query);
-    console.log('Client config:', freshClient.config());
+    const query = `*[_type == "blogPost"] | order(createdAt desc) {
+      _id,
+      title,
+      description,
+      productURL,
+      price,
+      previewImage,
+      previewTitle,
+      previewDescription,
+      createdAt,
+      updatedAt,
+      tags
+    }`;
 
-    const posts = await freshClient.fetch(query, {}, {
-      cache: 'no-store'
-    });
+    try {
+      const posts = await freshClient.fetch(query);
+      console.log('Successfully fetched posts:', posts);
 
-    console.log('Posts from Sanity:', posts);
-
-    return new NextResponse(JSON.stringify(posts), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
-    });
+      return NextResponse.json(posts);
+    } catch (fetchError) {
+      console.error('Sanity fetch error:', {
+        message: fetchError.message,
+        details: fetchError.details,
+        statusCode: fetchError.statusCode
+      });
+      
+      throw fetchError; // Re-throw to be caught by outer try-catch
+    }
 
   } catch (error) {
-    console.error('Error in getPosts:', error);
-    return new NextResponse(
-      JSON.stringify({
-        error: 'Failed to fetch posts',
-        details: error.message,
-        env: {
-          hasProjectId: !!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-          hasDataset: !!process.env.NEXT_PUBLIC_SANITY_DATASET,
-          hasToken: !!process.env.SANITY_API_TOKEN
-        }
-      }),
-      { status: 500 }
-    );
+    console.error('Error in getPosts:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
+
+    return NextResponse.json({
+      error: 'Failed to fetch posts',
+      details: error.message,
+      type: error.name,
+      env: {
+        hasProjectId: !!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+        hasDataset: !!process.env.NEXT_PUBLIC_SANITY_DATASET,
+        hasToken: !!process.env.SANITY_API_TOKEN
+      }
+    }, { status: 500 });
   }
 }

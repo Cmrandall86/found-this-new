@@ -7,13 +7,12 @@ export default {
       name: "title", 
       title: "Title", 
       type: "string",
-      validation: Rule => Rule.required().min(2).max(100)
+      validation: Rule => Rule.required()
     },
     { 
       name: "description", 
       title: "Description", 
-      type: "text",
-      validation: Rule => Rule.max(500)
+      type: "text"
     },
     { 
       name: "productURL", 
@@ -25,41 +24,33 @@ export default {
       name: "price", 
       title: "Price", 
       type: "number",
-      validation: Rule => Rule.required().min(0).precision(2)
+      validation: Rule => Rule.required()
     },
     {
       name: "previewImage",
       title: "Preview Image",
-      type: "string",
-      description: "Product preview image URL"
+      type: "string"
     },
     {
       name: "previewTitle",
       title: "Preview Title",
-      type: "string",
-      description: "Product preview title"
+      type: "string"
     },
     {
       name: "previewDescription",
       title: "Preview Description",
-      type: "text",
-      description: "Product preview description"
+      type: "text"
     },
     {
       name: "createdAt",
       title: "Created At",
       type: "datetime",
-      options: {
-        readOnly: true,
-      },
+      validation: Rule => Rule.required()
     },
     {
       name: "updatedAt",
       title: "Updated At",
-      type: "datetime",
-      options: {
-        readOnly: true,
-      },
+      type: "datetime"
     },
     {
       name: "tags",
