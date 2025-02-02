@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "export": "npm run build && next export",
-    "fetchImageUrls": "node ./fetchImageUrls.js",
-    "postbuild": "cp public/_headers dist/_headers"
+    "fetchImageUrls": "node ./fetchImageUrls.js"
   },
   "dependencies": {
     "@sanity/client": "^6.22.3",

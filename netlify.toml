@@ -7,17 +7,24 @@
     Surrogate-Control = "no-store"
 
 [[headers]]
-  for = "/*.webp"
+  for = "/_next/image/*"
   [headers.values]
     Cache-Control = "no-store, no-cache, must-revalidate"
-    
+    Pragma = "no-cache"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate"
+    Pragma = "no-cache"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
 [build]
-  command = "npm run build"
+  command = "next build"
   publish = ".next"
 
 [build.environment]
