@@ -7,89 +7,71 @@ export const revalidate = 0; // Disable caching
 
 export async function GET() {
   try {
-    // Create a fresh client for each request
+    // Log environment check first thing
+    const envCheck = {
+      projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+      dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
+      hasToken: !!process.env.SANITY_API_TOKEN,
+      nodeEnv: process.env.NODE_ENV
+    };
+    console.log('Environment check:', envCheck);
+
+    if (!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) throw new Error('Missing projectId');
+    if (!process.env.NEXT_PUBLIC_SANITY_DATASET) throw new Error('Missing dataset');
+    if (!process.env.SANITY_API_TOKEN) throw new Error('Missing token');
+
+    // Create client with basic config first
     const client = createClient({
       projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
       dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
       apiVersion: '2024-02-02',
       useCdn: false,
-      token: process.env.SANITY_API_TOKEN,
-      ignoreBrowserTokenWarning: true
+      token: process.env.SANITY_API_TOKEN
     });
 
-    // Log configuration (safely)
-    console.log('Sanity Configuration:', {
-      projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID?.substring(0, 4) + '...',
-      dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
-      hasToken: !!process.env.SANITY_API_TOKEN,
-      timestamp: new Date().toISOString() // Add timestamp to verify fresh requests
-    });
+    // Try a simple query first
+    const testQuery = '*[_type == "blogPost"][0...1]';
+    console.log('Testing connection with query:', testQuery);
+    
+    try {
+      const testResult = await client.fetch(testQuery);
+      console.log('Test query result:', testResult);
+    } catch (testError) {
+      console.error('Test query failed:', testError);
+      throw new Error(`Test query failed: ${testError.message}`);
+    }
 
-    // Query with explicit timestamp to bust cache
-    const timestamp = new Date().getTime();
-    const query = `*[_type == "blogPost"] | order(createdAt desc) {
-      _id,
-      title,
-      description,
-      productURL,
-      price,
-      previewImage,
-      previewTitle,
-      previewDescription,
-      createdAt,
-      updatedAt,
-      tags
-    }[@ != null] {
-      ...,
-      "_timestamp": "${timestamp}"
-    }`;
+    // If we get here, basic connection works, try full query
+    const query = `*[_type == "blogPost"] | order(createdAt desc)`;
+    console.log('Executing main query');
+    
+    const posts = await client.fetch(query);
+    console.log('Query successful, found posts:', posts?.length);
 
-    const posts = await client.fetch(query, {}, {
-      cache: 'no-store',
-      next: { revalidate: 0 }
-    });
-
-    // Compare with known good data
-    console.log(`Fetched ${posts.length} posts at ${new Date().toISOString()}`);
-    console.log('Post IDs:', posts.map(p => p._id));
-
-    return new NextResponse(JSON.stringify(posts), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
-        'Pragma': 'no-cache',
-        'Expires': '-1',
-        'Surrogate-Control': 'no-store',
-        'X-Fetch-Time': new Date().toISOString()
-      }
-    });
+    return NextResponse.json(posts);
 
   } catch (error) {
-    console.error('Detailed error:', {
+    console.error('Full error details:', {
       message: error.message,
       name: error.name,
       stack: error.stack,
-      config: {
+      env: {
         hasProjectId: !!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-        hasDataset: !!process.env.NEXT_PUBLIC_SANITY_DATASET,
-        hasToken: !!process.env.SANITY_API_TOKEN
+        projectIdLength: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID?.length,
+        dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
+        hasToken: !!process.env.SANITY_API_TOKEN,
+        tokenLength: process.env.SANITY_API_TOKEN?.length
       }
     });
 
-    return new NextResponse(
-      JSON.stringify({
-        error: 'Failed to fetch posts',
-        details: error.message,
-        time: new Date().toISOString()
-      }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-store'
-        }
+    return NextResponse.json({
+      error: 'Failed to fetch posts',
+      details: error.message,
+      env: {
+        hasProjectId: !!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+        dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
+        hasToken: !!process.env.SANITY_API_TOKEN
       }
-    );
+    }, { status: 500 });
   }
 }
