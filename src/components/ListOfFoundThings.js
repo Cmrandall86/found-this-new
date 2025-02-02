@@ -1,8 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTable, useSortBy } from "react-table";
 import ProductCard from "@/components/ProductCard";
+import imageUrlBuilder from '@sanity/image-url';
 import client from '../../lib/sanityClient';
 import "../../styles/ListOfFoundThings.css";
+
+// Initialize the image URL builder
+const builder = imageUrlBuilder(client);
+
+// Helper function to build image URLs
+function urlFor(source) {
+  return builder.image(source);
+}
 
 export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,42 +30,21 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     }
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // Increase timeout
-
-      const response = await fetch(
-        `/api/fetchPreview?url=${encodeURIComponent(url)}&t=${Date.now()}`,
-        { 
-          signal: controller.signal,
-          headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
-          }
-        }
-      );
-
-      clearTimeout(timeoutId);
-
+      const response = await fetch(`/api/fetchPreview?url=${encodeURIComponent(url)}&t=${Date.now()}`);
       if (!response.ok) {
-        throw new Error(`Failed to fetch preview: ${response.statusText}`);
+        throw new Error(`Failed to fetch preview for URL: ${url}, Status: ${response.status}`);
       }
-
       const data = await response.json();
-      
-      // Only update if we got valid data
-      if (data && (data.images?.length > 0 || data.title)) {
-        setPreviews(prev => ({ ...prev, [itemId]: data }));
-        fetchedURLs.current.add(itemId);
-      }
+      setPreviews(prev => ({ ...prev, [itemId]: data }));
+      fetchedURLs.current.add(itemId);
     } catch (error) {
       console.error(`Error fetching preview for URL ${url}:`, error.message);
-      // Don't cache failed attempts
       setPreviews(prev => ({
         ...prev,
         [itemId]: {
-          title: "Preview Unavailable",
-          description: "Unable to load preview data",
-          images: []
+          title: "No Preview Available",
+          description: "Unable to fetch preview data.",
+          images: ["https://via.placeholder.com/300x200?text=No+Image"],
         },
       }));
     }
@@ -75,36 +63,15 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
 
   // Fetch previews and apply filters
   useEffect(() => {
-    const fetchBatch = async (items) => {
-      for (const item of items) {
-        if (item.productURL && !previews[item._id] && !fetchedURLs.current.has(item._id)) {
-          await fetchPreviewData(item.productURL, item._id);
-          await new Promise(resolve => setTimeout(resolve, 1000)); // Increase delay between requests
-        }
+    // Only fetch previews for items that don't have them yet
+    items.forEach((item) => {
+      if (item.productURL && !previews[item._id]) {
+        fetchPreviewData(item.productURL, item._id);
       }
-    };
-
-    // Reset fetchedURLs when items change
-    fetchedURLs.current = new Set();
-
-    const unfetchedItems = items.filter(
-      item => item.productURL && !previews[item._id]
-    );
-
-    // Process in smaller batches
-    const batchSize = 2;
-    for (let i = 0; i < unfetchedItems.length; i += batchSize) {
-      const batch = unfetchedItems.slice(i, i + batchSize);
-      fetchBatch(batch);
-    }
+    });
 
     handleTagFilter(selectedTag);
-
-    // Cleanup function
-    return () => {
-      fetchedURLs.current.clear();
-    };
-  }, [items]);
+  }, [items]); // Only depend on items changing
 
   const uniqueTags = [...new Set(items.flatMap((item) => item.tags || []))].filter((tag) => tag.trim() !== "");
 
@@ -144,6 +111,22 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       toggleSortBy("createdAt", true);
     } else if (value === "dateOldest") {
       toggleSortBy("createdAt", false);
+    }
+  };
+
+  // Function to get optimized image URL
+  const getOptimizedImageUrl = (mainImage) => {
+    if (!mainImage?.asset?._ref) return null;
+    
+    try {
+      return urlFor(mainImage)
+        .width(800)
+        .height(600)
+        .quality(90)
+        .url();
+    } catch (error) {
+      console.error('Error generating image URL:', error, mainImage);
+      return null;
     }
   };
 
@@ -200,18 +183,9 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       <div className="grid-container">
         {rows.map((row) => {
           prepareRow(row);
-          const { title, productURL, price, tags, imageUrl } = row.original;
+          const { title, productURL, price, tags, mainImage } = row.original;
           const previewData = previews[row.original._id];
           const isMenuOpen = showMenu[row.original._id];
-          
-          // Debug log to check what data we're getting
-          console.log('Row data:', {
-            id: row.original._id,
-            title,
-            imageUrl: row.original.imageUrl,
-            previewData
-          });
-
           const toggleMenu = () =>
             setShowMenu((prev) => ({
               ...prev,
@@ -231,7 +205,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
               onDelete={() => onDelete(row.original._id)}
               onEdit={() => onEdit(row.original)}
               tags={tags}
-              mainImage={row.original.mainImage}
+              mainImage={mainImage ? getOptimizedImageUrl(mainImage) : null}
               postId={row.original._id}
             />
           );

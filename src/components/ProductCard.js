@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import MiniMenu from "@/components/MiniMenu";
 import "../../styles/productcard.css";
 import { FaImage } from 'react-icons/fa';
-import { urlFor } from '../../lib/sanityClient';
 
 export default function ProductCard({
   title,
@@ -27,68 +26,42 @@ export default function ProductCard({
 
   // Handle image loading
   useEffect(() => {
-    const getImageUrl = () => {
-      // First try the Sanity image
-      if (mainImage?.asset?._ref) {
-        return urlFor(mainImage).url();
-      }
-      // Then try preview images if available
-      if (previewData?.images?.length > 0) {
-        return previewData.images[0];
-      }
-      return null;
-    };
-
-    const imageUrl = getImageUrl();
-    console.log('Image data:', {
-      mainImage,
-      previewImages: previewData?.images,
-      finalUrl: imageUrl,
-      title
-    });
-
+    const imageUrl = mainImage || (previewData?.images?.[0] || null);
     if (!imageUrl) {
       setIsLoading(false);
       setHasError(true);
-      if (imageRef.current) {
-        imageRef.current.removeAttribute('src');
-      }
       return;
     }
 
+    // Create new image instance
     const img = new Image();
-    let mounted = true;
-
+    
     img.onload = () => {
-      if (mounted && imageRef.current) {
-        console.log('Image loaded successfully:', imageUrl);
-        imageRef.current.src = imageUrl;
-        imageRef.current.style.opacity = '1';
+      if (mountedRef.current) {
         setIsLoading(false);
         setHasError(false);
-      }
-    };
-
-    img.onerror = () => {
-      if (mounted) {
-        console.error('Image failed to load:', {
-          url: imageUrl,
-          title,
-        });
-        setIsLoading(false);
-        setHasError(true);
         if (imageRef.current) {
-          imageRef.current.removeAttribute('src');
+          imageRef.current.src = imageUrl;
         }
       }
     };
 
+    img.onerror = () => {
+      if (mountedRef.current) {
+        console.error(`Failed to load image for ${title}`);
+        setIsLoading(false);
+        setHasError(true);
+      }
+    };
+
+    // Start loading
     setIsLoading(true);
     setHasError(false);
     img.src = imageUrl;
 
+    // Cleanup
     return () => {
-      mounted = false;
+      mountedRef.current = false;
       img.onload = null;
       img.onerror = null;
     };
@@ -118,28 +91,31 @@ export default function ProductCard({
           </div>
         )}
         
-        <div className="image-with-description">
-          {hasError ? (
-            <div className="placeholder-container">
-              <FaImage className="placeholder-icon" />
-              <span>No Image Available</span>
-            </div>
-          ) : (
+        {hasError ? (
+          <div className="placeholder-container">
+            <FaImage className="placeholder-icon" />
+            <span>No Image Available</span>
+          </div>
+        ) : (
+          <div className="image-with-description">
             <img
               ref={imageRef}
               alt={title || "Product image"}
-              className="preview-thumbnail"
+              className={`preview-thumbnail ${!isLoading ? 'loaded' : ''}`}
               onClick={toggleDescription}
-              style={{ display: isLoading ? 'none' : 'block' }}
+              style={{ 
+                opacity: isLoading ? 0 : 1,
+                transition: 'opacity 0.3s ease'
+              }}
             />
-          )}
-          {showDescription && (
-            <div className="image-description-overlay">
-              <button className="close-description" onClick={toggleDescription}>×</button>
-              <p>{description || previewData?.description || "No description available"}</p>
-            </div>
-          )}
-        </div>
+            {showDescription && (
+              <div className="image-description-overlay">
+                <button className="close-description" onClick={toggleDescription}>×</button>
+                <p>{description || previewData?.description || "No description available"}</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <h3 className="product-card-title">{title}</h3>

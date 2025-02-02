@@ -6,31 +6,22 @@ export async function POST(request) {
   try {
     const data = await request.json();
     
-    // Validate required fields
-    if (!data.title || !data.productURL || typeof data.price !== 'number') {
-      return NextResponse.json({ 
-        error: 'Missing required fields' 
-      }, { status: 400 });
-    }
-
-    // Create post document matching the schema exactly
+    // Create the post document
     const newPost = await client.create({
       _type: "blogPost",
-      title: data.title.trim(),
-      description: (data.description || '').trim(),
-      productURL: data.productURL.trim(),
-      price: Number(data.price),
-      mainImage: data.mainImage, // This should be a Sanity image asset reference
+      title: data.title,
+      description: data.description || "",
+      productURL: data.productURL || "",
+      price: Number(data.price) || 0,
+      mainImage: data.mainImage || null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      tags: Array.isArray(data.tags) ? 
-        data.tags
-          .filter(tag => typeof tag === 'string' && tag.trim() !== '')
-          .map(tag => tag.trim())
-        : []
+      tags: Array.isArray(data.tags) ? data.tags : []
     });
 
-    return NextResponse.json(newPost);
+    return NextResponse.json(newPost, { 
+      headers: { 'Cache-Control': 'no-cache' } 
+    });
   } catch (error) {
     console.error('Error creating post:', error);
     return NextResponse.json({ 

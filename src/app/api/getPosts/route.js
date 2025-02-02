@@ -4,46 +4,47 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // Add explicit pagination with a high limit
-    const query = `*[_type == "blogPost"] | order(createdAt desc) [0...100] {
-      _id,
-      title,
-      description,
-      productURL,
-      price,
-      imageUrl,
-      createdAt,
-      updatedAt,
-      tags
-    }`;
+    // Basic query first to test connection
+    const query = `*[_type == "blogPost"] | order(createdAt desc)`;
 
-    const posts = await client.fetch(query);
+    const posts = await client.fetch(query).catch(err => {
+      console.error('Sanity fetch error:', err);
+      throw new Error(`Sanity fetch failed: ${err.message}`);
+    });
     
-    if (!Array.isArray(posts) || posts.length === 0) {
-      console.warn('No posts found or invalid response from Sanity');
-      return NextResponse.json([]);
+    if (!posts) {
+      console.error('No posts returned from Sanity');
+      return NextResponse.json({ error: 'No posts found' }, { status: 404 });
     }
 
-    // Transform and validate each post
+    // Transform posts after successful fetch
     const transformedPosts = posts.map(post => ({
       _id: post._id,
       title: post.title || 'Untitled',
       description: post.description || '',
       productURL: post.productURL || '',
       price: typeof post.price === 'number' ? post.price : 0,
-      imageUrl: post.imageUrl || '',
       tags: Array.isArray(post.tags) ? post.tags : [],
-      createdAt: post.createdAt || new Date().toISOString(),
-      updatedAt: post.updatedAt || new Date().toISOString()
+      createdAt: post.createdAt || post._createdAt || new Date().toISOString(),
+      updatedAt: post.updatedAt || post._updatedAt || new Date().toISOString(),
+      mainImage: post.mainImage || null
     }));
 
     return NextResponse.json(transformedPosts, {
       headers: {
-        'Cache-Control': 'no-store'
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Pragma': 'no-cache'
       }
     });
   } catch (error) {
-    console.error('Error fetching posts:', error);
-    return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 });
+    console.error('Error in getPosts:', error);
+    return NextResponse.json(
+      { 
+        error: 'Error fetching posts',
+        details: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      }, 
+      { status: 500 }
+    );
   }
 }
