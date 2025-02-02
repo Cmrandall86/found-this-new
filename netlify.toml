@@ -18,6 +18,12 @@
     Cache-Control = "no-store, no-cache, must-revalidate"
     Pragma = "no-cache"
 
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate"
+    Pragma = "no-cache"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
@@ -27,7 +33,11 @@
   command = "next build"
   publish = ".next"
 
+[functions]
+  node_bundler = "esbuild"
+
 [build.environment]
   NEXT_PUBLIC_SANITY_PROJECT_ID = "your-project-id"
   NEXT_PUBLIC_SANITY_DATASET = "production"
   NODE_VERSION = "18"
+  NEXT_TELEMETRY_DISABLED = "1"
