@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // Query aligned with schema
+    // Query aligned with schema, with cache disabled
     const query = `*[_type == "blogPost"] | order(createdAt desc) {
       _id,
       title,
@@ -16,9 +16,10 @@ export async function GET() {
       updatedAt
     }`;
 
-    const posts = await client.fetch(query).catch(err => {
-      console.error('Sanity fetch error:', err);
-      throw new Error(`Sanity fetch failed: ${err.message}`);
+    // Use fetch with cache disabled
+    const posts = await client.fetch(query, {}, {
+      cache: 'no-cache',  // Disable Sanity CDN cache
+      perspective: 'published'  // Get only published documents
     });
 
     if (!posts) {
@@ -31,8 +32,8 @@ export async function GET() {
       title: post.title || 'Untitled',
       description: post.description || '',
       productURL: post.productURL || '',
-      price: Number(post.price || 0).toFixed(2), // Ensure 2 decimal places
-      tags: Array.isArray(post.tags) ? [...new Set(post.tags)].filter(tag => tag.trim()) : [], // Ensure unique tags
+      price: Number(post.price || 0),
+      tags: Array.isArray(post.tags) ? [...new Set(post.tags)].filter(tag => tag.trim()) : [],
       createdAt: post.createdAt || new Date().toISOString(),
       updatedAt: post.updatedAt || new Date().toISOString()
     }));
