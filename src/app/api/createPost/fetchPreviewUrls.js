@@ -16,83 +16,81 @@ const isAmazonUrl = (url) => {
 };
 
 export async function fetchPreviewUrls(url) {
-    if (!url) {
-      return {
-        title: "No URL provided",
-        description: "Please provide a valid URL",
-        images: ["https://via.placeholder.com/300x200?text=No+URL"],
-      };
-    }
+  try {
+    const response = await fetch(url);
+    const html = await response.text();
 
-    if (!isAmazonUrl(url)) {
-      return {
-        title: "Non-Amazon URL",
-        description: "Only Amazon URLs are supported at this time",
-        images: ["https://via.placeholder.com/300x200?text=Non+Amazon+URL"],
-      };
-    }
-  
-    try {
-      const previewData = await withTimeout(
-        getLinkPreview(url, {
-          headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.5",
-            "Cache-Control": "no-cache",
-            "Pragma": "no-cache"
-          },
-        }),
-        5000
-      );
-  
-      // More strict filtering for product images
-      const productImages = (previewData.images || [])
-        .filter(img => {
-          // Only accept Amazon product images
-          const isProductImage = 
-            img.includes('/images/I/') && // Main product image path
-            !img.includes('banner') &&    // Exclude banners
-            !img.includes('advertisement') &&
-            !img.includes('promotion') &&
-            !img.includes('deal') &&
-            !img.includes('sprite') &&    // Exclude sprite sheets
-            !img.includes('button') &&    // Exclude buttons
-            !img.includes('logo') &&      // Exclude logos
-            img.includes('._');           // Amazon image format marker
+    // Extract preview image URL
+    let previewImage = '';
+    const imageMatches = html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/i) ||
+                        html.match(/<meta\s+name="og:image"\s+content="([^"]+)"/i);
 
-          return isProductImage;
-        })
-        .map((img) => {
-          // Extract the base image ID
-          const baseUrl = img.split('._')[0];
-          const timestamp = Date.now();
-          // Use a more reliable Amazon image format
-          return `${baseUrl}._AC_SX679_.jpg?t=${timestamp}`;
-        })
-        .filter((img, index, self) => self.indexOf(img) === index)
-        .slice(0, 1); // Only take the first image to ensure consistency
-
-      if (productImages.length === 0) {
-        return {
-          title: previewData.title || "No title available",
-          description: previewData.description || "No description available",
-          images: ["https://via.placeholder.com/300x200?text=No+Product+Image"],
-        };
-      }
-
-      return {
-        title: previewData.title || "No title available",
-        description: previewData.description || "No description available",
-        images: productImages,
-      };
+    if (imageMatches && imageMatches[1]) {
+      const potentialImage = imageMatches[1];
       
-    } catch (error) {
-      console.error("Error fetching preview:", error);
-      return {
-        title: "Error fetching preview",
-        description: "Unable to fetch preview data",
-        images: ["https://via.placeholder.com/300x200?text=Error+Loading+Preview"],
-      };
+      // Filter out small images and ensure it's a product image
+      if (isValidProductImage(potentialImage)) {
+        previewImage = potentialImage;
+      } else {
+        // Try to find a valid product image in the HTML
+        const productImageMatches = html.match(/https:\/\/m\.media-amazon\.com\/images\/I\/[A-Za-z0-9-]+\._.*?\.jpg/g);
+        if (productImageMatches) {
+          // Find the first valid product image
+          previewImage = productImageMatches.find(img => isValidProductImage(img)) || '';
+        }
+      }
     }
+
+    // Extract preview title and description as before...
+    const titleMatches = html.match(/<meta\s+property="og:title"\s+content="([^"]+)"/i) ||
+                        html.match(/<meta\s+name="og:title"\s+content="([^"]+)"/i) ||
+                        html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    const previewTitle = titleMatches ? titleMatches[1] : '';
+
+    const descMatches = html.match(/<meta\s+property="og:description"\s+content="([^"]+)"/i) ||
+                       html.match(/<meta\s+name="og:description"\s+content="([^"]+)"/i) ||
+                       html.match(/<meta\s+name="description"\s+content="([^"]+)"/i);
+    const previewDescription = descMatches ? descMatches[1] : '';
+
+    return {
+      previewImage,
+      previewTitle,
+      previewDescription
+    };
+  } catch (error) {
+    console.error('Error fetching preview URLs:', error);
+    return {
+      previewImage: '',
+      previewTitle: '',
+      previewDescription: ''
+    };
+  }
 }
+
+// Helper function to validate product images
+function isValidProductImage(url) {
+  if (!url) return false;
+
+  // Must be an Amazon media URL
+  if (!url.includes('m.media-amazon.com/images/I/')) return false;
+
+  // Extract the image ID portion (e.g., "21hOCmsvPQL" from the URL)
+  const imageIdMatch = url.match(/\/I\/([A-Za-z0-9]+)/);
+  if (!imageIdMatch) return false;
+  
+  const imageId = imageIdMatch[1];
+  
+  // Filter criteria:
+  // 1. Image ID should be longer than 10 chars (filters out small images like "21hOCmsvPQL")
+  // 2. Should contain product image indicators
+  const isLongEnough = imageId.length > 10;
+  const hasProductIndicators = url.includes('._AC_') || 
+                              url.includes('._SX') || 
+                              url.includes('._SY') ||
+                              url.includes('._UX') ||
+                              url.includes('._UY');
+
+  return isLongEnough && hasProductIndicators;
+}
+
+export default fetchPreviewUrls;
