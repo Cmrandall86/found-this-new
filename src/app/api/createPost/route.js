@@ -3,6 +3,19 @@ import client from '../../../../lib/sanityClient';
 import { NextResponse } from 'next/server';
 import { getLinkPreview } from "link-preview-js";
 
+// Add this helper function at the top
+function transformAmazonImageUrl(url) {
+  if (!url || !url.includes('m.media-amazon.com/images/I/')) return url;
+  
+  // Extract the base image ID
+  const baseImageMatch = url.match(/\/I\/([A-Za-z0-9]+)\./);
+  if (!baseImageMatch) return url;
+  
+  // Construct a high-resolution URL using the base image ID
+  const baseImageId = baseImageMatch[1];
+  return `https://m.media-amazon.com/images/I/${baseImageId}._AC_SL1500_.jpg`;
+}
+
 export async function POST(request) {
   try {
     const data = await request.json();
@@ -37,21 +50,24 @@ export async function POST(request) {
 
     console.log('All Amazon images:', amazonImages);
 
-    // Look for the thumbnail image first (it's usually the main product image)
-    const thumbnailImage = amazonImages.find(img => img.includes('_SX38_SY50_CR'));
-    
-    // Convert thumbnail URL to high-res version
-    const previewImage = thumbnailImage ? 
-      thumbnailImage.replace(
-        '_SX38_SY50_CR,0,0,38,50_',
-        '_SX300_SY400_CR,0,0,300,400_'  // Using slightly smaller dimensions for product cards
-      ) : 
-      // Fallback to previous logic if no thumbnail found
-      amazonImages.find(img => 
-        !img.includes('sprite') && 
-        !img.includes('button') &&
-        !img.includes('_SR100,100_')
-      );
+    // Transform all images to high-res versions first
+    const highResImages = amazonImages.map(img => transformAmazonImageUrl(img));
+    console.log('High-res images:', highResImages);
+
+    // Select the best image
+    let previewImage = null;
+
+    // First try to find a product image
+    previewImage = highResImages.find(img => 
+      img.includes('._AC_') && 
+      !img.includes('sprite') && 
+      !img.includes('button')
+    );
+
+    // If no suitable image found, use the first high-res image
+    if (!previewImage && highResImages.length > 0) {
+      previewImage = highResImages[0];
+    }
 
     console.log('Selected preview image:', previewImage);
 

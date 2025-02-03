@@ -15,8 +15,25 @@ const isAmazonUrl = (url) => {
   }
 };
 
+// Helper function to transform Amazon image URLs
+function transformAmazonImageUrl(url) {
+  console.log('Transforming URL:', url);
+  if (!url || !url.includes('m.media-amazon.com/images/I/')) return url;
+  
+  // First, extract the base image ID
+  const baseImageMatch = url.match(/\/I\/([A-Za-z0-9]+)\./);
+  if (!baseImageMatch) return url;
+  
+  // Construct a high-resolution URL using the base image ID
+  const baseImageId = baseImageMatch[1];
+  const transformedUrl = `https://m.media-amazon.com/images/I/${baseImageId}._AC_SL1500_.jpg`;
+  console.log('Transformed to:', transformedUrl);
+  return transformedUrl;
+}
+
 export async function fetchPreviewUrls(url) {
   try {
+    console.log('Fetching preview for URL:', url);
     const response = await fetch(url);
     const html = await response.text();
 
@@ -26,22 +43,28 @@ export async function fetchPreviewUrls(url) {
                         html.match(/<meta\s+name="og:image"\s+content="([^"]+)"/i);
 
     if (imageMatches && imageMatches[1]) {
-      const potentialImage = imageMatches[1];
-      
-      // Filter out small images and ensure it's a product image
-      if (isValidProductImage(potentialImage)) {
-        previewImage = potentialImage;
-      } else {
-        // Try to find a valid product image in the HTML
-        const productImageMatches = html.match(/https:\/\/m\.media-amazon\.com\/images\/I\/[A-Za-z0-9-]+\._.*?\.jpg/g);
-        if (productImageMatches) {
-          // Find the first valid product image
-          previewImage = productImageMatches.find(img => isValidProductImage(img)) || '';
-        }
+      console.log('Found image in meta:', imageMatches[1]);
+      previewImage = transformAmazonImageUrl(imageMatches[1]);
+      console.log('After first transform:', previewImage);
+    }
+
+    // If no image found in meta tags, try to find in HTML for Amazon products
+    if (!previewImage && isAmazonUrl(url)) {
+      const productImageMatches = html.match(/https:\/\/m\.media-amazon\.com\/images\/I\/[A-Za-z0-9-]+\._[^"]+\.jpg/g);
+      if (productImageMatches && productImageMatches.length > 0) {
+        console.log('Found product image in HTML:', productImageMatches[0]);
+        previewImage = transformAmazonImageUrl(productImageMatches[0]);
+        console.log('After second transform:', previewImage);
       }
     }
 
-    // Extract preview title and description as before...
+    // One final check to ensure we have a high-res image
+    if (previewImage && previewImage.includes('m.media-amazon.com/images/I/')) {
+      previewImage = transformAmazonImageUrl(previewImage);
+      console.log('Final image URL:', previewImage);
+    }
+
+    // Extract preview title and description
     const titleMatches = html.match(/<meta\s+property="og:title"\s+content="([^"]+)"/i) ||
                         html.match(/<meta\s+name="og:title"\s+content="([^"]+)"/i) ||
                         html.match(/<title[^>]*>([^<]+)<\/title>/i);
@@ -52,45 +75,30 @@ export async function fetchPreviewUrls(url) {
                        html.match(/<meta\s+name="description"\s+content="([^"]+)"/i);
     const previewDescription = descMatches ? descMatches[1] : '';
 
-    return {
-      previewImage,
-      previewTitle,
-      previewDescription
+    // Return all required properties
+    const result = {
+      previewImage: previewImage || '',
+      previewTitle: previewTitle || '',
+      previewDescription: previewDescription || '',
+      images: previewImage ? [previewImage] : [],
+      title: previewTitle || '',
+      description: previewDescription || ''
     };
+
+    console.log('Final result:', result);
+    return result;
+
   } catch (error) {
     console.error('Error fetching preview URLs:', error);
     return {
       previewImage: '',
       previewTitle: '',
-      previewDescription: ''
+      previewDescription: '',
+      images: [],
+      title: '',
+      description: ''
     };
   }
-}
-
-// Helper function to validate product images
-function isValidProductImage(url) {
-  if (!url) return false;
-
-  // Must be an Amazon media URL
-  if (!url.includes('m.media-amazon.com/images/I/')) return false;
-
-  // Extract the image ID portion (e.g., "21hOCmsvPQL" from the URL)
-  const imageIdMatch = url.match(/\/I\/([A-Za-z0-9]+)/);
-  if (!imageIdMatch) return false;
-  
-  const imageId = imageIdMatch[1];
-  
-  // Filter criteria:
-  // 1. Image ID should be longer than 10 chars (filters out small images like "21hOCmsvPQL")
-  // 2. Should contain product image indicators
-  const isLongEnough = imageId.length > 10;
-  const hasProductIndicators = url.includes('._AC_') || 
-                              url.includes('._SX') || 
-                              url.includes('._SY') ||
-                              url.includes('._UX') ||
-                              url.includes('._UY');
-
-  return isLongEnough && hasProductIndicators;
 }
 
 export default fetchPreviewUrls;
