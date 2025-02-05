@@ -11,7 +11,7 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   const [filteredItems, setFilteredItems] = useState(items);
   const fetchedURLs = useRef(new Set());
   const isInitialRender = useRef(true);
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
 
   // Fetch preview data
   const fetchPreviewData = async (url, itemId) => {
@@ -30,7 +30,6 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
       }
 
       const data = await response.json();
-      console.log('Preview data received for:', url, data);
 
       if (!data || !data.images) {
         throw new Error('Invalid preview data received');
@@ -68,7 +67,6 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
     const fetchAllPreviews = async () => {
       for (const item of items) {
         if (item.productURL) {
-          console.log('Fetching preview for:', item.productURL);
           await fetchPreviewData(item.productURL, item._id);
         }
       }
@@ -101,7 +99,23 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
   }, [toggleSortBy]);
 
   const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
+    const searchTerm = e.target.value;
+    setSearchQuery(searchTerm);
+    
+    // Filter items based on search term and selected tag
+    const filtered = items.filter((item) => {
+      const matchesSearch = 
+        item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.price?.toString().includes(searchTerm) ||
+        item.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesTag = selectedTag ? item.tags?.includes(selectedTag) : true;
+      
+      return matchesSearch && matchesTag;
+    });
+    
+    setFilteredItems(filtered);
   };
 
   const handleSortChange = (e) => {
@@ -133,35 +147,44 @@ export default function ListOfFoundThings({ items, onDelete, onEdit }) {
           onClick={toggleFilters}
           aria-label={showFilters ? 'Hide filters' : 'Show filters'}
         >
-          <span className="filter-toggle-text">Filters</span>
+          <span className="filter-toggle-text">Filter & Sort</span>
           <span className="filter-toggle-icon">{showFilters ? '▼' : '▲'}</span>
         </button>
         <div className={`filter-controls ${showFilters ? 'show' : ''}`}>
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={handleSearch}
-            className="filter-input"
-          />
-          <div className="dropdown-container">
+          <button 
+            className="close-filters"
+            onClick={() => setShowFilters(false)}
+            aria-label="Close filters"
+          >
+            ×
+          </button>
+          <div className="search-wrapper">
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={handleSearch}
+              className="filter-input"
+            />
+          </div>
+          <div className="filter-group">
             <select 
               onChange={handleSortChange} 
               className="sort-select" 
               defaultValue="dateNewest"
             >
-              <option value="title">A-Z</option>
-              <option value="priceLow">Price ↑</option>
-              <option value="priceHigh">Price ↓</option>
-              <option value="dateNewest">Newest</option>
-              <option value="dateOldest">Oldest</option>
+              <option value="dateNewest">Newest First</option>
+              <option value="dateOldest">Oldest First</option>
+              <option value="title">Name (A-Z)</option>
+              <option value="priceLow">Price (Low-High)</option>
+              <option value="priceHigh">Price (High-Low)</option>
             </select>
             <select 
               onChange={(e) => handleTagFilter(e.target.value)} 
               value={selectedTag} 
               className="tag-filter-select"
             >
-              <option value="">All Tags</option>
+              <option value="">All Categories</option>
               {uniqueTags.map((tag) => (
                 <option key={tag} value={tag}>{tag}</option>
               ))}

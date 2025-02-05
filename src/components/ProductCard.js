@@ -25,9 +25,7 @@ export default function ProductCard({
   const imageRef = useRef(null);
 
   useEffect(() => {
-    console.log('Preview image URL:', previewImage);
     if (!previewImage) {
-      console.log('No preview image provided');
       setIsLoading(false);
       setHasError(true);
       return;
